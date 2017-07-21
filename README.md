@@ -1,0 +1,1 @@
+Svako od učesnika će napraviti svoj branch u kome će komitovati celokupan projekta.
