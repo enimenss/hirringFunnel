@@ -1,0 +1,510 @@
+﻿@model HiringFunnel.Models.ProcessInstance
+
+@using HiringFunnel.Models;
+@using HiringFunnel.DTO;
+@{
+    ViewBag.Title = "EditContactInProcess";
+}
+@{
+    Contact cont = (Contact)TempData["cont"];
+    List<InterviewerView> interviewers = (List<InterviewerView>)TempData["interviewers"];
+    Process p = (Process)TempData["process"];
+    bool disabled = (bool)(ViewData["disablecontrols"]);
+    SessionLogin user = (SessionLogin)Session["User"];
+
+}
+
+
+
+
+<style>
+
+    .hidee {
+        display: none;
+    }
+
+    .showw {
+        display: block;
+    }
+
+    .table_legenda {
+        table-layout: fixed;
+    }
+
+      .table_legenda td {
+          word-wrap: break-word;
+        }
+
+
+</style>
+<div style="padding:1%">
+    <div class="row">
+        <div class="col-md-12">
+            <div style="text-align:center;font-size:medium;padding:1%;border: 1px solid black">
+            <strong>Ime Procesa:</strong>&nbsp;<span>@p.Name</span>&nbsp;&nbsp;<strong>Tehnologija:</strong>&nbsp;<span>@p.Technologies</span>&nbsp;&nbsp;<strong>Senioritet:</strong>&nbsp;<span>@p.Seniority.ToString()</span>&nbsp;&nbsp;<strong>Datum dodavanja:</strong>&nbsp;<span>@Model.CreationDate.ToString()</span>
+                </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-9">
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <h3>Kontakt</h3>
+    <input type="hidden" name="Id" value=@Model.Id />
+    <input type="hidden" name=CurrentPhase value=@Model.CurrentPhase />
+    <div class="row" style=" border: 1px solid black;padding:1%;width:100%">
+        <div class="col-md-3"><p>Komentar</p></div>
+        <div class="col-md-6">
+            <div >
+        <textarea id="Contact_Comment" name="Contact_Comment" style="width:100%;margin-top:2%"></textarea>
+                </div>
+        <input type="checkbox" name="Contact_Comment_Hide" value="true" />Sakrij komentar
+            @if (!disabled && !(user.Role==UserLevel.Interviewer))
+            {
+        <button type="button" onclick="KontaktIPonudaKomentar(this,'Contact_Comment')" style="float:right">Sacuvaj Komentar</button>
+            }
+            <button type="button" onclick="ShowComment(this.value)" data-toggle='modal' data-target='#messageModal' value="Contact_Comment" style="float:right">Pregled Komentara</button>
+        </div>
+        <div class="col-md-3"><input type="checkbox" name="InterviewScheduled" @(Model.InterviewScheduled?"checked":"") value="true" />Intervju zakazan</div>
+    </div>
+
+    <h3>Intervju</h3>
+    <div class="row" style=" border: 1px solid black;">
+        <div class="row" style="margin:1%">
+            <div class="col-md-3"><p>Interviewer</p></div>
+             <div class="col-md-6">
+                 <select name="IntervjuInerviewers" multiple="multiple" >
+                  @foreach (var interw in interviewers)
+                  {
+                      bool pom = false;
+                      if (Model.Interviewers.Where(x =>x.InterviewerId == interw.Id && x.Type==AnnotationType.Interview_Feedback).SingleOrDefault() != null)
+                      {
+                          pom = true;
+                      }
+                     <option  value="@interw.Id" selected=@(pom ? true : false) >@interw.FirstName</option>
+                  }
+                 </select>&nbsp;&nbsp;
+                 <span>Datum Intervjua</span>
+                 <input type="datetime" name="InterviewDate" value=@Model.InterviewDate />
+             </div>
+            <div class="col-md-3"><input type="checkbox" name="InterviewNoticed" @(Model.InterviewNoticed?"checked":"") value="true"/>Kandidat obavesten</div>
+        </div>
+        <div class="row">
+        <div class="col-md-3" style="padding-left:3%"><p>Interview Feedback</p></div>
+        <div class="col-md-6" style="padding:1%">
+            <div>
+                <textarea id="Interview_Feedback" name="Interview_Feedback" style="width:100%;margin-top:2%;margin-bottom:2%"></textarea>
+            </div>
+              @if (!disabled)
+              {
+                  if ( user.Role!=UserLevel.Interviewer || Model.Interviewers.Where(x => x.InterviewerId == user.Id && x.Type == AnnotationType.Interview_Feedback).SingleOrDefault() != null)
+                  {
+            <button type="button" onclick="Feedback('Interview_Feedback')" style="float:right">Sacuvaj Feedback</button>
+                      }
+                  }
+            <button type="button" onclick="ShowComment(this.value)" data-toggle='modal' data-target='#messageModal' value="Interview_Feedback" style="float:right">Pregled Feedbacka</button>
+        </div>
+        <div class="col-md-3">
+            <div><input type="checkbox" name="InterviewHeld" @(Model.InterviewHeld?"checked":"") value="true" />Intervju odrzan</div>
+            <div><input type="checkbox" name="TestScheduled" @(Model.TestScheduled?"checked":"") value="true" />Test Zakazan</div>
+        </div>
+            </div>
+    </div>
+
+    <h3>Test</h3>
+    <div class="row" style=" border: 1px solid black;">
+        <div class="row" style="margin:1%">
+            <div class="col-md-3"><p>Interviewer</p></div>
+            <div class="col-md-6">
+                <select multiple="multiple" name="TestInterviewers" >
+                   @foreach (var interw in interviewers)
+                   {
+                       bool pom = false;
+                       if (Model.Interviewers.Where(x => x.InterviewerId == interw.Id && x.Type==AnnotationType.Test_Feedback).SingleOrDefault() != null)
+                       {
+                           pom = true;
+                       }
+
+                    <option value="@interw.Id" selected=@(pom ? true : false) >@interw.FirstName</option>
+                   }
+                </select>&nbsp;&nbsp;
+                <span>Datum Testa</span>
+                <input type="datetime" name="TestDate" value=@Model.TestDate />
+            </div>
+            <div class="col-md-3"><input type="checkbox" name="TestNoticed" @(Model.TestNoticed?"checked":"") value="true" />Kandidat obavesten</div>
+        </div>
+        <div class="row">
+            <div class="col-md-3"><p>Test Feedback</p></div>
+            <div class="col-md-6" style="padding:1%">
+                <div>
+                    <textarea id="Test_Feedback" name="Test_Feedback" style="width:100%;margin-top:2%;margin-bottom:2%"></textarea>
+                </div>
+                      @if (!disabled)
+                      {
+                          if (user.Role != UserLevel.Interviewer || Model.Interviewers.Where(x => x.InterviewerId == user.Id && x.Type == AnnotationType.Test_Feedback).SingleOrDefault() != null)
+                          {
+                <button type="button" onclick="Feedback('Test_Feedback')" style="float:right">Sacuvaj Feedback</button>
+                          }
+                      }
+                <button type="button" onclick="ShowComment(this.value)" data-toggle='modal' data-target='#messageModal' value="Test_Feedback" style="float:right">Pregled Feedbacka</button>
+                
+            </div>
+            <div class="col-md-3">
+                <div><input type="checkbox" name="TestHeld" value="true" @(Model.TestHeld?"checked":"") />Test odrzan</div>
+                <div><input type="checkbox" name="TestDefenseScheduled" @(Model.TestDefenseScheduled?"checked":"") value="true" />Odbrana Zakazana</div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Obrana</h3>
+    <div class="row" style=" border: 1px solid black;">
+        <div class="row" style="margin:1%">
+            <div class="col-md-3"><p>Interviewer</p></div>
+            <div class="col-md-6">
+                <select name="OdbranaInterviewers" multiple="multiple">
+                    @foreach (var interw in interviewers)
+                    {
+                        bool pom = false;
+                        if (Model.Interviewers.Where(x => x.InterviewerId == interw.Id && x.Type==AnnotationType.TestDefense_Feedback).SingleOrDefault() != null)
+                        {
+                            pom = true;
+                        }
+                        <option  value="@interw.Id" selected=@(pom ? true : false) >@interw.FirstName</option>
+                    }
+                </select>&nbsp;&nbsp;
+                <span>Datum Odbrane</span>
+                <input type="datetime" name="TestDefenseDate" value=@Model.TestDefenseDate />
+            </div>
+            <div class="col-md-3">
+                <div><input type="checkbox" name="TestDefenseNoticed" @(Model.TestDefenseNoticed?"checked":"") value="true" />Kandidat Obavesten</div>
+                <div><input type="checkbox" name="TestDefenseHeld" @(Model.TestDefenseHeld?"checked":"") value="true" />Odbrana Odrzana</div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3"><p>Odbrana Feedback</p></div>
+            <div class="col-md-6" style="padding:1%">
+                <div>
+                    <textarea id="TestDefense_Feedback"name="TestDefense_Feedback" style="width:100%;margin-top:2%;margin-bottom:2%"></textarea>
+                </div>
+                @if (!disabled)
+                {
+                    if (user.Role != UserLevel.Interviewer || Model.Interviewers.Where(x => x.InterviewerId == user.Id && x.Type == AnnotationType.TestDefense_Feedback).SingleOrDefault() != null)
+                    {
+                <button type="button" onclick="Feedback('TestDefense_Feedback')" style="float:right">Sacuvaj Feedback</button>
+                    }
+                }
+                <button type="button" onclick="ShowComment(this.value)" data-toggle='modal' data-target='#messageModal' value="TestDefense_Feedback" style="float:right">Pregled Feedbacka</button>
+            </div>
+            <div class="col-md-3"></div>
+        </div>
+    </div>
+
+    <h3>Ponuda</h3>
+    <div class="row" style=" border: 1px solid black;padding:1%;width:100%">
+        <div class="col-md-3"><p>Ponuda Komentar</p></div>
+        <div class="col-md-6">
+            <div>
+                <textarea id="Offer_Comment" name="Offer_Comment" style="width:100%;margin-top:2%"></textarea>
+            </div>
+            <input type="checkbox" name="Offer_Comment_Hide" value="true" />Sakrij komentar
+                @if (!disabled && !(user.Role == UserLevel.Interviewer))
+                {
+            <button type="button" onclick="KontaktIPonudaKomentar(this,'Offer_Comment')" style="float:right">Sacuvaj Komentar</button>
+                }
+            <button type="button" onclick="ShowComment(this.value)" data-toggle='modal' data-target='#messageModal' value="Offer_Comment" style="float:right">Pregled Komentara</button>
+        </div>
+        <div class="col-md-3"><input type="checkbox" name="OfferSent" @(Model.OfferSent?"checked":"") value="true" />Ponuda</div>
+    </div>
+
+    <h3>Primljen</h3>
+    <div class="row" style=" border: 1px solid black;padding:1%;width:100%">
+        <div class="col-md-3"><p>Primljen Feedback</p></div>
+        <div class="col-md-6">
+            <div>
+                <textarea id="Acceptance_State" name="Acceptance_State" style="width:100%;margin-top:2%"></textarea>
+            </div>
+             @if (!disabled && !(user.Role == UserLevel.Interviewer))
+             {
+            <button type="button" onclick="Feedback('Acceptance_State')" style="float:right" >Sacuvaj Feedback</button>
+             }
+            <button type="button" onclick="ShowComment(this.value)" data-toggle='modal' data-target='#messageModal' value="Acceptance_State" style="float:right">Pregled Feedbacka</button>
+        </div>
+        <div class="col-md-3"><input type="checkbox" name="Accepted" @(Model.Accepted?"checked":"") value="true" />Primljen</div>
+    </div>
+
+    <h3>Odustao</h3>
+    <div class="row" style=" border: 1px solid black;padding:1%;width:100%">
+        <div class="col-md-3"><p>Odustao Feedback</p></div>
+        <div class="col-md-6">
+            <div>
+                <textarea id="Quit_State" name="Quit_State" style="width:100%;margin-top:2%"></textarea>
+            </div>
+              @if (!disabled && !(user.Role == UserLevel.Interviewer))
+              {
+            <button type="button" onclick="Feedback('Quit_State')" style="float:right">Sacuvaj Feedback</button>
+              }
+            <button type="button" onclick="ShowComment(this.value)" data-toggle='modal' data-target='#messageModal' value="Quit_State" style="float:right">Pregled Feedbacka</button>
+        </div>
+        <div class="col-md-3"><input type="checkbox" name="Quit" @(Model.Quit?"checked":"") value="true" />Odustao</div>
+    </div>
+
+    <h3>Odbijen</h3>
+    <div class="row" style=" border: 1px solid black;padding:1%;width:100%">
+        <div class="col-md-3"><p>Odbijen Feedback</p></div>
+        <div class="col-md-6">
+            <div>
+                <textarea id="Rejection_State" name="Rejection_State" style="width:100%;margin-top:2%"></textarea>
+            </div>
+             @if (!disabled && !(user.Role == UserLevel.Interviewer))
+             {
+            <button type="button" onclick="Feedback('Rejection_State')" style="float:right">Sacuvaj Feedback</button>
+             }
+            <button type="button" onclick="ShowComment(this.value)" data-toggle='modal' data-target='#messageModal' value="Rejection_State" style="float:right">Pregled Feedbacka</button>
+        </div>
+        <div class="col-md-3"><input type="checkbox" name="Rejected" value="true" @(Model.Rejected?"checked":"") />Odbijen</div>
+    </div>
+
+    <div><input type="submit" value="Sacuvaj" /></div>
+}
+
+   </div>
+       
+            
+            <div class="col-md-3" >
+                <div style="margin:auto;position:fixed;align-items:center">
+                <h3>Kandidat Info</h3>
+                <div style="margin:auto;border: 1px solid black;padding:1%;width:100%">
+                    <p><span>Ime i Prezime</span>&nbsp;&nbsp;<span>@cont.FirstName&nbsp;@cont.LastName</span></p>
+                    <p><span>Lokacija</span>&nbsp;&nbsp;<span>@cont.Location</span></p>
+                    <p style="text-align:center"><a href='@Url.Action("OpenContactCV","Edit",new { Id=cont.Id })'>Vidi CV</a></p>
+                    <p style="text-align:center"><a href="@Url.Action("Info","Edit",new { id=cont.Id})">Vidi Kontakt</a></p>
+                </div>
+                    @if (!(user.Role == UserLevel.Interviewer))
+                    {
+                <h3>To do</h3>
+                <div style="border: 1px solid black;padding:1%;width:100%">
+                    <p style="text-align:center"><textarea id="toDoMessage"></textarea></p>
+                      @if (!disabled)
+                      {
+                    <p style="text-align:center"><button type="button" onclick="AddToDo()">Dodaj</button></p>
+                      }
+                    <div id="toDo"></div>
+                </div>
+                    }
+
+                    </div>
+        </div>
+    </div>
+
+
+    <div class="modal modal-scroll fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content" >
+                <div class="modal-header" >
+                    <div>
+                        <h4 id="messageModalHeader" class="modal-title item-name" style="text-align: center; margin-bottom: 0%; font-weight: 900"></h4>
+                    </div>
+                </div>
+
+                    <div class="modal-body">
+
+                        <div style="text-align:center;">
+                            <p>
+                            <span style="float:left"><button type="button" id="comm" onclick="ShowHide('Details')" class="btn btn-info">Comment</button></span>
+                                @if (!(user.Role == UserLevel.Interviewer))
+                                {
+                            <span style="float:left" id="hiddencomm" ><button type="button" onclick="ShowHide('DetailsHidden')" class="btn btn-info">Hidden Comment</button></span>
+                                }
+                                </p>
+                            <div class="hidee" id="Details" >
+                            <table  class="table table_legenda" style="width:100%">
+                                <thead style="width:100%;background-color:#555">
+                                <tr><th style="text-align:center;width:60%">Message</th><th style="text-align:center;width:20%">Author</th><th style="text-align:center;width:20%">Time</th></tr>
+                                    </thead>
+                                <tbody style="width:100%" id="DetailsBody"></tbody>
+                            </table>
+                                </div>
+                            <div class="hidee" id="DetailsHidden">
+                            <table class="table table_legenda" style="width:100%">
+                                <thead style="width:100%;background-color:#555">
+                                    <tr><th style="text-align:center;width:60%">Message</th><th style="text-align:center;width:20%">Author</th><th style="text-align:center;width:20%">Time</th></tr>
+                                </thead>
+                                <tbody style="width:100%" id="DetailsHiddenBody"></tbody>
+                            </table>
+                                </div>
+
+
+
+                        </div>
+                    </div>
+                    <div id="modalFooter" class="modal-footer">
+
+                    </div>
+                
+            </div>
+        </div>
+    </div>
+
+    </div>
+
+<script>
+    var User =@Html.Raw(Json.Encode(user));
+
+    $(document).ready(function () {
+                  $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            data: { "InstanceId":@Model.Id },
+            cache: false,
+            url: '@Url.Action("GetToDo", "Process")',
+            success: function (obj) {
+                $.each(obj, function (i, f) {
+                    $("#toDo").append("<p><span><input type='checkbox' "+(f.Completed?'checked disabled':'') +" onchange='DisableToDo(this)' value='" + f.Id + "' ></span>" + f.Message + "</p>")
+                });
+            }
+
+        });
+
+                  var disabled = '@(ViewData["disablecontrols"])';
+                  if (disabled == 'True') {
+                      $('input,select').attr('disabled', disabled);
+                  }
+
+                  if (User.Role == 0) {
+                      $("input[type='checkbox'],input[type='datetime'] ,select").attr('disabled', disabled);
+                  }
+
+
+    });
+
+    var AddToDo = function () {
+        var Message = $("#toDoMessage").val();
+                $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            data: { "InstanceId":@Model.Id ,"Message": Message },
+            cache: false,
+            url: '@Url.Action("AddToDo", "Process")',
+            success: function (obj) {
+                $("#toDoMessage").val("");
+                $("#toDo").append("<p><span><input type='checkbox' onchange='DisableToDo(this)' value='"+obj.Id+"' ></span>"+obj.Message+"</p>")
+            }
+
+        });
+
+    }
+    var DisableToDo = function (element) {
+        console.log("uso");
+        $.ajax({
+         type: 'POST',
+            dataType: 'json',
+            data: { "Id":$(element).val() },
+            cache: false,
+            url: '@Url.Action("DisableToDo", "Process")',
+            success: function (obj) {
+                $(element).attr('disabled', 'disabled');
+            }
+
+        });
+        }
+
+    var KontaktIPonudaKomentar = function (element, phase) {
+        var Message = $("#" + phase).val();
+        if (Message == "" || Message == null) {
+            console.log("uso");
+            return;
+        }
+        var isHidden = element.previousElementSibling.checked;
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            data: { "InstanceId":@Model.Id ,"Message": Message, "isHidden": isHidden ,"Phase":phase},
+            cache: false,
+            url: '@Url.Action("KontaktIPonudaKomentar", "Process")',
+            success: function (obj) {
+                $("#" + phase).val("");
+            }
+
+        });
+    }
+
+
+       var Feedback = function (phase) {
+           var Message = $("#" + phase).val();
+           if (Message == "" || Message == null) {
+               console.log("uso");
+               return;
+           }
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            data: { "InstanceId":@Model.Id ,"Message": Message, "isHidden":false ,"Phase":phase},
+            cache: false,
+            url: '@Url.Action("KontaktIPonudaKomentar", "Process")',
+            success: function (obj) {
+                $("#" + phase).val("");
+            }
+
+        });
+    }
+
+
+       var ShowComment = function (phase) {
+           console.log(phase);
+
+
+            $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            data: { "InstanceId":@Model.Id ,"Phase":phase},
+            cache: false,
+            url: '@Url.Action("GetInstanseComment", "Process")',
+            success: function (obj) {
+
+                var x = $('#DetailsBody');
+                var y = $('#messageModalHeader');
+                var z = $('#DetailsHiddenBody');
+                var hidden = $("#hiddencomm");
+                $('#Details').addClass('showw');
+                if (phase != 'Contact_Comment' && phase != 'Offer_Comment') {
+                    hidden.removeClass('hidee');
+                    hidden.removeClass('showw');
+                    hidden.addClass('hidee');
+
+                }
+                else {
+                    hidden.removeClass('hidee');
+                    hidden.removeClass('showw');
+                    hidden.addClass('showw');
+                }
+                y.empty();
+                x.empty();
+                z.empty();
+                y.text(phase);
+                $.each(obj.data, function (i, f) {
+                    if (f.Hidden == true ) {
+                        z.append("<tr style='width:100%'><td style='width:60%'><span >" + f.Message + " </span></td><td style='width:20%'>" + f.AuthorName + "</td><td style='width:20%'>" + f.Time + "</td></tr>");
+                    }
+                    else {
+                        x.append("<tr style='width:100%'><td style='width:60%'><span >" + f.Message + " </span></td><td style='width:20%'>" + f.AuthorName + "</td><td style='width:20%'>" + f.Time + "</td></tr>");
+                    }
+                    $('#messageModal').modal('show');
+                    $('#Details').addClass('showw');
+                    $('#DetailsHidden').removeClass('showw');
+                });
+            }
+
+        });
+
+       }
+
+       var ShowHide = function (element) {
+
+           $("#Details").removeClass("showw");
+           $("#DetailsHidden").removeClass("showw");
+           $("#" + element).addClass("showw");
+       }
+
+</script>

@@ -1,0 +1,91 @@
+﻿@model HiringFunnel.DTO.LoginViewModel
+
+@{
+    Layout = null;
+
+}
+
+@Styles.Render("~/Content/css")
+@Scripts.Render("~/bundles/modernizr")
+@Scripts.Render("~/bundles/jquery")
+
+<html>
+<head>
+<title>Login</title>
+ </head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+@using (Html.BeginForm("Index","Login",FormMethod.Post,new { id="proba" }))
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+        <h4 style="text-align:center">Login</h4>
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Password, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit"  value="Create" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+@ViewBag.Error
+
+<div>
+</div>
+            </div>
+        <div class="col-md-3"></div>
+        </div>
+    </div>
+    </body>
+</html>
+
+<script>
+    //$(function () {
+    //    $("#proba").submit(function (event) {
+    //        if ($("#Password").val() == "") {
+    //            return;
+    //        }
+    //        var staro = $("#Password").val();
+    //        $("#Password").val("MojHesiranPass");
+    //        $("#Password").text(staro);
+
+    //        console.log($("#Password"));
+    //        console.log(event);
+
+    //    });
+    //})
+  
+    
+    
+</script>
+
+@section Scripts {
+   @Scripts.Render("~/bundles/jquery")
+   @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/jqueryval")
+}

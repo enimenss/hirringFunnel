@@ -1,0 +1,236 @@
+﻿@model PagedList.IPagedList<HiringFunnel.DTO.ContactView>
+@using PagedList.Mvc;
+@using HiringFunnel.DTO;
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+
+@{
+    ViewBag.Title = "Home";
+}
+
+<!DOCTYPE html>
+
+@{ 
+    SessionLogin user = (SessionLogin)Session["User"];
+
+}
+
+@{
+    List<TechnologyView> techno = (List<TechnologyView>)TempData["Techno"];
+}
+<html>
+<head>
+
+    <style>
+        .dataTable > thead > tr > th[class*="sort"]::after {
+            display: none
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            max-width:300px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            padding: 0;
+            margin: auto;
+        }
+
+        .show {
+            display: block;
+        }
+    </style>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+  <div class="container">
+      <div class="row">
+
+      <div class="col-md-2"></div>
+          <div class="col-md-8" style="margin-top:5%;text-align:center;width:50%">
+             
+    <table id="myTable"  style="margin-top:4%;width:20%">
+        <thead border="1" style="background-color:#555">
+         <tr>
+             <td>
+             <input type="text" placeholder="FirstName" id="tFirstName" style="width:100%"  />
+                 </td>
+             <td>
+                 <input type="text" placeholder="LastName" id="tLastName" style="width:100%"  />
+             </td>
+           <td></td>
+             <td>
+             </td>
+             <td>
+                 @*<input type="text" placeholder="Seniority" id="tSeniority" style="width:100%" />*@
+                 <select id="tSeniority">
+                     <option value='' selected>Seniority</option>
+                     <option value="Entry">Entry</option>
+                     <option value="Junior">Junior</option>
+                     <option value="Medior">Medior</option>
+                     <option value="Senior">Senior</option>
+                 </select>
+             </td>
+             <td>
+                 @*<input type="text" placeholder="Tehnologies" id="tTechnologies" style="width:100%" />*@
+                 <select id="tTechnologies">
+                     <option value="" selected>Technology</option>
+                     @foreach(var tech in techno)
+                     {
+                         <option value='@tech.Name'>@tech.Name</option>
+                     }
+                 </select>
+             </td>
+             <td><input type="button" value="Search" id="btnSearch" style="width:100%" /></td>
+         </tr>
+        <tr>
+            <th>
+               FirstName
+            </th>
+            <th>
+               LastName
+            </th>
+            <th>
+                Email
+            </th>
+            <th>
+               Phone
+            </th>
+            <th>
+               Seniority
+            </th>
+            <th>Technologies</th>
+
+            <th>Add in Process</th>
+            
+
+        </tr>
+            </thead>
+   
+    
+    </table>
+              </div>
+          <div class="col-md-2"></div>
+          </div>
+      </div>
+</body>
+</html>
+
+<script src="~/Scripts/DataTables/jquery.dataTables.js"></script>
+<link rel="stylesheet" type="text/css" href="~/Content/DataTables/css/jquery.dataTables.css">
+
+<script>
+    $(document).ready(function () {
+
+        var User =@Html.Raw(Json.Encode(user));
+        console.log(User);
+
+        $('#myTable').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "orderMulti": false,
+            columnDefs: [{
+                targets: "datatable-nosort",
+                orderable: false
+            }],
+            "dom": '<"top"i>rt<"bottom"lp><"clear">',
+            "aLengthMenu": [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]],
+            "ajax": {
+                "url": '@Url.Action("LoadContactData", "Home")',
+                "type": "POST",
+                "datatype": "json"
+            },
+            "columns": [
+
+                { "data": "FirstName", "name": "FirstName", "autoWidth": true },
+                { "data": "LastName", "name": "LastName", "autoWidth": true },
+                { "data": "Email", "name": "Email", "autoWidth": true },
+                { "data": "Phone", "name": "Phone", "autoWidth": true },
+                { "data": "Seniority", "name": "Seniority", "autoWidth": true },
+                { "data": "Technologies", "name": "Technologies", "autoWidth": true },
+                
+                { 
+            
+                    
+                    'render': function (data, type, row) {
+
+                        if (User.Role == 0)
+                            return "";
+                        return "<button type='button' onclick='addInProcess(this.value)'  name='prosledi' value=" + row.Id + " >Dodaj u Proces</button><div id=" + row.Id + " class='dropdown-content'></div>";
+                        
+                    }
+                }
+            ]
+
+
+        });
+
+        eTable = $('#myTable').DataTable();
+      
+
+        $('#btnSearch').click(function () {
+        eTable.columns(0).search($('#tFirstName').val().trim());
+        eTable.columns(1).search($('#tLastName').val().trim());
+        eTable.columns(4).search($('#tSeniority option:selected').val().trim());
+        eTable.columns(5).search($('#tTechnologies option:selected').val().trim());
+        eTable.draw();
+    });
+
+    //vrati = function (event) {
+    //    var roww = $("#"+event.id).parents('tr')[0]
+    //    var data = eTable.row(roww).data();
+    //    console.log(data);
+    //    eTable.row(roww).node().remove();
+    //    eTable.draw();
+    //}
+    });
+
+
+    var addInProcess = function (ContactId) {
+
+
+        document.getElementById(ContactId).classList.toggle("show");
+
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            data: { "ContactId": ContactId },
+            cache: false,
+            url: '@Url.Action("GetAllNotContactProcess", "Home")',
+            success: function (obj) {
+
+                var drop = $("#" + ContactId);
+                drop.empty();
+
+                var y = $("<span></span>");
+                var x = $("<select id='allProcess'></select>");
+                y.append(x);
+                drop.append(y);
+                console.log(x);
+                $.each(obj.data, function (i, f) {
+                    x.append("<option value=" + f.Id + ">" + f.Name + "</option>");
+                }
+
+                );
+                drop.append("<span><button onclick='AddInProc("+ContactId+")' type='button' >Dodaj</button></span>");
+
+            }
+        });
+    }
+
+    AddInProc = function (ContactId) {
+        var ProcId = $("#allProcess :selected");
+         $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                data: { "ProcessId": ProcId.val(), "ContactId": ContactId },
+                cache: false,
+                url: '@Url.Action("Dodaj","Process")',
+                success: function (obj) {
+                    ProcId.remove();
+                }
+
+            });
+    }
+</script>

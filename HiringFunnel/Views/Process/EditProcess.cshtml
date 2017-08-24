@@ -1,0 +1,614 @@
+﻿@model HiringFunnel.DTO.ProcessView
+@using HiringFunnel.DTO;
+
+@{
+    ViewBag.Title = "EditProcess";
+}
+
+@{
+    List<TechnologyView> techno = (List<TechnologyView>)TempData["Techno"];
+}
+<style>
+.dataTables_wrapper {
+  max-width:30%;
+  display:inline-block;
+  padding:0;
+  margin:0;
+}
+    a {
+        color: inherit;
+    }
+
+    a:hover {
+        color: blue;
+    } 
+
+    table.dataTable thead th, table.dataTable thead td {
+        padding: 0px 0px;
+        border-bottom: 1px solid #111;
+    }
+
+    hr {
+        display: block;
+        position: relative;
+        padding: 0;
+        margin: 8px auto;
+        height: 0;
+        width: 100%;
+        max-height: 0;
+        font-size: 1px;
+        line-height: 0;
+        clear: both;
+        border: none;
+        border-top: 1px solid #aaaaaa;
+        border-bottom: 1px solid #ffffff;
+    }
+
+    table.display {
+        margin: 0 auto;
+        width: 100%;
+        clear: both;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+    .cont {
+        min-width: 100%;
+        margin: auto;
+        height: 320px;
+        border: 1px solid black;
+    }
+
+    .column {
+        width: 11.5%;
+        display: inline-block;
+        /*float: left;*/
+        margin: 0.3%;
+        height: 280px;
+        overflow-y: scroll;
+        border: 1px solid black;
+    }
+
+    .forLabel {
+        width: 11.5%;
+        margin: 0.3%;
+    }
+
+    .kontact {
+        width: 93%;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 5%;
+        margin-top: 5%;
+        min-height: 50px;
+        border: 1px solid black;
+        word-wrap: break-word
+    }
+</style>
+
+<div class="row">
+    <div class="col-md-2">
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+        <h4>Opste Informacije</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.Id)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-4" })
+            <div class="col-md-8">
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Technologies, htmlAttributes: new { @class = "control-label col-md-6" })
+            <div class="col-md-6">
+                <select id="Technologies" name="Technologies" >
+               @foreach (TechnologyView tech in techno)
+                    {
+                      <option value=@tech.Name @(Model.Technologies ==tech.Name ? "selected" : "")>@tech.Name</option>
+                          }
+                            </select>
+
+                     </div>
+                  </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Seniority, htmlAttributes: new { @class = "control-label col-md-4" })
+            <div class="col-md-8">
+                <select name="Seniority" id="Seniority" class="form-control">
+                    <option value="0" @(Model.Seniority == SeniorityLevel.Entry ? "selected" : "")>Entry</option>
+                    <option value="1" @(Model.Seniority == SeniorityLevel.Junior ? "selected" : "")>Junior</option>
+                    <option value="2" @(Model.Seniority == SeniorityLevel.Medior ? "selected" : "")>Medior</option>
+                    <option value="5" @(Model.Seniority == SeniorityLevel.Senior ? "selected" : "")>Senior</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.StartDate, htmlAttributes: new { @class = "control-label col-md-4" })
+            <div class="col-md-8">
+                @Html.EditorFor(model => model.StartDate, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" />
+                <button type="button" data-toggle='modal' data-target='#EndProcessModal'>EndProcess</button>
+            </div>
+        </div>
+    </div>
+}
+</div>
+    <div class="col-md-10" >
+        <div class="col-md-7">
+        <table id="myTable"  class="display" style="width:500px;margin-top:4%;display:inline-block;">
+            <thead border="1" style="background-color:#555">
+                <tr>
+                    <td>
+                        <input type="text" placeholder="FirstName" id="tFirstName" style="width:100%" />
+                    </td>
+                    <td>
+                        <input type="text" placeholder="LastName" id="tLastName" style="width:100%" />
+                    </td>
+                  
+                    <td>
+                        <input type="text" placeholder="Seniority" id="tSeniority" style="width:100%" />
+                    </td>
+                    <td>
+                        <input type="text" placeholder="Tehnologies" id="tTechnologies" style="width:100%" />
+                    </td>
+                    <td><input type="button" value="Search" id="btnSearch" style="width:100%" /></td>
+                </tr>
+                <tr>
+                    <th>
+                        FirstName
+                    </th>
+                    <th>
+                        LastName
+                    </th>
+                    <th>
+                        Seniority
+                    </th>
+                    <th>Technologies</th>
+
+                    <th>Pogledaj</th>
+                    <th>Dodaj</th>
+
+                </tr>
+            </thead>
+
+
+        </table>
+            </div>
+        <div class="col-md-4" style="margin-left:1%;margin-top:4%">
+    
+        <table id="myTable1" class="table table-condensed" style="width:40%;display:inline-block">
+            <thead border="1" style="background-color:#555">
+                <tr>
+                    <th>
+                        FirstName
+                    </th>
+                    @*<th>
+                        LastName
+                    </th>*@
+                    <th>
+                        Seniority
+                    </th>
+                    <th>Techno</th>
+
+                    <th>Kont</th>
+
+                </tr>
+            </thead>
+
+
+        </table>
+            </div>
+    </div>
+    </div>
+    <div class="row">
+            <div class="col-md-12">
+                <div class="cont">
+                   
+                    <label class="forLabel">Kontakt</label>
+                    <label class="forLabel">Intervju</label>
+                    <label class="forLabel">Test</label>
+                    <label class="forLabel">Odbrana</label>
+                    <label class="forLabel">Ponuda</label>
+                    <label class="forLabel">Primljen</label>
+                    <label class="forLabel">Odustao</label>
+                    <label class="forLabel">Odbijen</label>
+
+                   
+                 
+                    
+                   
+                    <div id="Kontakt" ondrop="drop1(event)" ondragover="allowDrop(event)" class="column"></div>
+                    <div id="Intervju" ondrop="drop2(event)" ondragover="allowDrop(event)" class="column"></div>
+                    <div id="Test" ondrop="drop3(event)" ondragover="allowDrop(event)" class="column"></div>
+                    <div id="Odbrana" ondrop="drop4(event)" ondragover="allowDrop(event)" class="column"></div>
+                    <div id="Ponuda" ondrop="drop5(event)" ondragover="allowDrop(event)" class="column"></div>
+                    <div id="Primljen" ondrop="drop6(event)" ondragover="allowDrop(event)" class="column"></div>
+                    <div id="Odustao" ondrop="drop7(event)" ondragover="allowDrop(event)" class="column"></div>
+                    <div id="Odbijen" ondrop="drop8(event)" ondragover="allowDrop(event)" class="column"></div>
+
+                    
+                </div>
+            </div>
+        </div>
+   
+
+
+<div class="modal modal-scroll fade" id="EndProcessModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h4 class="modal-title item-name" style="text-align: center; margin-bottom: 0%; font-weight: 900">End Process</h4>
+                </div>
+            </div>
+            <div class="modal-body">
+
+                <div style="text-align:center">
+                    <span>Dali ste sigurni da zelite da zavrsite process ?</span>
+                </div>
+            </div>
+            <div class="modal-footer" style="text-align:center">
+                <button type="button" onclick="EndProcess()" >End Process</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+    <script src="~/Scripts/DataTables/jquery.dataTables.js"></script>
+<link rel="stylesheet" type="text/css" href="~/Content/DataTables/css/jquery.dataTables.css">
+
+<script>
+
+
+    $(document).ready(function () {
+
+          var disabled = '@(ViewData["disablecontrols"])';
+
+        $('#myTable').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "orderMulti": false,
+            "bAutoWidth": false, // Disable the auto width calculation
+            "columnDefs": [
+                {
+                    "width": "6%",
+                    "targets": 0
+                }
+            ],
+            "dom": '<"top"i>rt<"bottom"lp><"clear">',
+            "aLengthMenu": [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]],
+            "ajax": {
+                "url": '@Url.Action("LoadContactProcessData", "Process")',
+                "type": "POST",
+                "datatype": "json",
+                "data": function (d) {
+                    d.Id = '@Model.Id';
+                }
+            },
+
+            "columns": [
+
+                { "data": "FirstName", "name": "FirstName", "autoWidth": true },
+                { "data": "LastName", "name": "LastName", "autoWidth": true },
+                { "data": "Seniority", "name": "Seniority", "autoWidth": true },
+                { "data": "Technologies", "name": "Technologies", "autoWidth": true },
+
+                {
+
+                    'render': function (data, type, row) {
+
+
+                        return "<a href=@Url.Action("Info","Edit")/?id="+row.Id+ "  name='prosledi' value=" + row.Id + " id=" + row.Id + " >Pogledaj</button>";
+                    }
+                },
+
+                {
+
+                    'render': function (data, type, row) {
+
+
+                        return "<button onclick='Dodaj(this)' " +( disabled=='True'?'disabled':'') + " name='prosledi' value=" + row.Id + " id=" + row.Id + " >Dodaj</button>";
+                    }
+                }
+            ]
+        });
+
+        $('#myTable1').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "orderMulti": false,
+
+            "dom": '<"top"i>rt<"bottom"lp><"clear">',
+            "aLengthMenu": [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]],
+            "ajax": {
+                "url": '@Url.Action("LoadContactInProcessData", "Process")',
+                "type": "POST",
+                "datatype": "json",
+                "data": function (d) {
+                    d.Id = '@Model.Id';
+                },
+                "columnDefs": [
+                    { "width": "7%", "targets": 0 }
+                ],
+            },
+            "columns": [
+
+                { "data": "FirstName", "name": "FirstName", "autoWidth": true },
+                //{ "data": "LastName", "name": "LastName", "autoWidth": true },
+                { "data": "Seniority", "name": "Seniority", "autoWidth": true },
+                { "data": "Technologies", "name": "Technologies", "autoWidth": true },
+
+                {
+
+                    'render': function (data, type, row) {
+
+                        return "<input onchange='Kontaktiran(this)' "+ ( disabled=='True'?'disabled':'')+"  type='checkbox' name=" + row.Id + " value=" + row.Id + " id=" + row.Id + " >Kont</input>";
+
+                    }
+                },
+            ]
+
+
+        });
+
+
+        eTable1 = $('#myTable1').DataTable();
+        eTable = $('#myTable').DataTable();
+        $('#btnSearch').click(function () {
+            eTable.columns(0).search($('#tFirstName').val().trim());
+            eTable.columns(1).search($('#tLastName').val().trim());
+            eTable.columns(2).search($('#tSeniority').val().trim());
+            eTable.columns(3).search($('#tTechnologies').val().trim());
+            eTable.draw();
+        });
+
+
+
+
+
+        var Dodaj = function (element) {
+            var roww = $(element).parents('tr')[0]
+            var data = eTable.row(roww).data();
+
+             $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                data: { "ProcessId":@Model.Id , "ContactId": data.Id },
+                cache: false,
+                url: '@Url.Action("Dodaj","Process")',
+                success: function (obj) {
+                    $('#myTable').DataTable().ajax.reload().draw();
+                    $('#myTable1').DataTable().ajax.reload().draw()
+                }
+
+            });
+        }
+    });
+
+        var EndProcess = function () {
+            $.ajax({
+                type: "post",
+                dataType: "json",
+                data: { "Id":@Model.Id},
+                url:'@Url.Action("EndProcess","Process")',
+                cache: false,
+                success: function (data) {
+                    window.location.href = '@Url.Action("EditProcess","Process",new { id=Model.Id })';
+                }
+            })
+        }
+
+      function Kontaktiran(element){
+
+            var roww = $(element).parents('tr')[0]
+            var data = $('#myTable1').DataTable().row(roww).data();
+
+             $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                data: { "ProcessId":@Model.Id , "ContactId": data.Id},
+                cache: false,
+                url: '@Url.Action("Contacted", "Process")',
+                success: function (obj) {
+
+
+                    $('#Kontakt').prepend("<div class='kontact' id=" + data.ProcInstId + " draggable='true' ondragstart='drag(event)' > <a href=@Url.Action("EditContactInProcess","Process")/?id=" + data.ProcInstId + " ><p>" + data.FirstName+" "+data.LastName + "</p><p>" + data.Seniority + "</p><p>"+data.Technologies+"</p></a></div>")
+                    $('#myTable1').DataTable().ajax.reload().draw()
+                    $('#myTable2').DataTable().ajax.reload().draw()
+                }
+
+            });
+    };
+
+
+    $.ajax({
+        type: 'POST',
+        dataType: 'json',
+        data: { "processId":@Model.Id  },
+        cache: false,
+        url: '@Url.Action("GetInstancesData", "Process")',
+        success: function (obj) {
+
+            $.each(obj.data.Contacts, function (i, f) {
+
+                $('#Kontakt').append("<div class='kontact' id=" + f.Id + " draggable='true' ondragstart='drag(event)' ><a href=@Url.Action("EditContactInProcess","Process")/?id=" + f.Id + " ><p>" + f.ContactName + "</p><hr><p>" + f.ContactSeniority + "</p><p>"+f.ContactTechnologies+"</p></a></div>")
+            });
+            $.each(obj.data.Interviews, function (i, f) {
+
+                $('#Intervju').append("<div class='kontact' id=" + f.Id + " draggable='true' ondragstart='drag(event)' ><a href=@Url.Action("EditContactInProcess","Process")/?id=" + f.Id + " ><p>" + f.ContactName + "</p><hr><p>" + f.ContactSeniority + "</p><p>" + f.ContactTechnologies +"</p></a></div>")
+            });
+            $.each(obj.data.Tests, function (i, f) {
+
+                $('#Test').append("<div class='kontact' id=" + f.Id + " draggable='true' ondragstart='drag(event)' ><a href=@Url.Action("EditContactInProcess","Process")/?id=" + f.Id + " ><p>" + f.ContactName + "</p><hr><p>" + f.ContactSeniority + "</p><p>" + f.ContactTechnologies +"</p></a></div>")
+            });
+
+            $.each(obj.data.TestDefenses, function (i, f) {
+
+                $('#Odbrana').append("<div class='kontact' id=" + f.Id + " draggable='true' ondragstart='drag(event)' ><a href=@Url.Action("EditContactInProcess","Process")/?id=" + f.Id + " ><p>" + f.ContactName + "</p><hr><p>" + f.ContactSeniority + "</p><p>" + f.ContactTechnologies +"</p></a></div>")
+            });
+            $.each(obj.data.Offers, function (i, f) {
+
+                $('#Ponuda').append("<div class='kontact' id=" + f.Id + " draggable='true' ondragstart='drag(event)' ><a href=@Url.Action("EditContactInProcess","Process")/?id=" + f.Id + " ><p>" + f.ContactName + "</p><hr><p>" + f.ContactSeniority + "</p><p>" + f.ContactTechnologies +"</p></a></div>")
+            });
+            $.each(obj.data.Accepts, function (i, f) {
+
+                $('#Primljen').append("<div class='kontact' id=" + f.Id + " draggable='true' ondragstart='drag(event)' ><a href=@Url.Action("EditContactInProcess","Process")/?id=" + f.Id + " ><p>" + f.ContactName + "</p><hr><p>" + f.ContactSeniority + "</p><p>" + f.ContactTechnologies +"</p></a></div>")
+            });
+            $.each(obj.data.Rejects, function (i, f) {
+
+                $('#Odbijen').append("<div class='kontact' id=" + f.Id + " draggable='true' ondragstart='drag(event)' ><a href=@Url.Action("EditContactInProcess","Process")/?id=" + f.Id + " > <p>" + f.ContactName + "</p><hr><p>" + f.ContactSeniority + "</p><p>" + f.ContactTechnologies +"</p></a></div>")
+            });
+            $.each(obj.data.Quits, function (i, f) {
+
+                $('#Odustao').append("<div class='kontact' id=" + f.Id + " draggable='true' ondragstart='drag(event)' ><a href=@Url.Action("EditContactInProcess","Process")/?id=" + f.Id + " ><p>" + f.ContactName + "</p><hr><p>" + f.ContactSeniority + "</p><p>" + f.ContactTechnologies +"</p></a></div>")
+            });
+             var disabled = '@(ViewData["disablecontrols"])';
+                  if (disabled=='True') {
+                      $('.kontact').attr('draggable', false);
+                  }
+        }
+
+    });
+
+
+
+     var Dodaj = function (element) {
+            var roww = $(element).parents('tr')[0]
+            var data = eTable.row(roww).data();
+
+             $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                data: { "ProcessId":@Model.Id , "ContactId": data.Id },
+                cache: false,
+                url: '@Url.Action("Dodaj","Process")',
+                success: function (obj) {
+                }
+
+            });
+             $('#myTable').DataTable().ajax.reload().draw();
+             $('#myTable1').DataTable().ajax.reload().draw()
+    }
+
+    function allowDrop(ev) {
+    ev.preventDefault();
+     }
+
+
+    var ChangePhase = function (Id,Phase) {
+        $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                data: { "Instance":Id , "Phase":Phase },
+                cache: false,
+                url: '@Url.Action("ChangePhase","Process")',
+                success: function (obj) {
+                }
+
+            });
+    }
+
+function drag(ev) {
+    ev.dataTransfer.setData("text", ev.target.id);
+}
+
+function drop1(ev) {
+    ev.preventDefault();
+
+
+    var data = ev.dataTransfer.getData("text");
+    if ($("#" + data).parent().get(0) != $("#Kontakt").get(0)) {
+        ChangePhase(data, "Kontakt");
+    }
+    $("#Kontakt").prepend($("#" + data));
+    }
+
+    function drop2(ev) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        if ($("#" + data).parent().get(0) != $("#Intervju").get(0)) {
+            ChangePhase(data, "Intervju");
+        }
+
+        $("#Intervju").prepend($("#" + data));
+    }
+    function drop3(ev) {
+        ev.preventDefault();
+
+        var data = ev.dataTransfer.getData("text");
+        if ($("#" + data).parent().get(0) != $("#Test").get(0)) {
+            ChangePhase(data, "Test");
+        }
+        $("#Test").prepend($("#" + data));
+    }
+
+
+    function drop4(ev) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        console.log($("#" + data).parent().get(0));
+        console.log($("#Odbrana").get(0));
+        if ($("#" + data).parent().get(0) != $("#Odbrana").get(0)) {
+            ChangePhase(data, "Odbrana");
+        }
+        $("#Odbrana").prepend($("#" + data));
+    }
+    function drop5(ev) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        if ($("#" + data).parent().get(0) != $("#Ponuda").get(0)) {
+            ChangePhase(data, "Ponuda");
+        }
+        $("#Ponuda").prepend($("#" + data));
+    }
+    function drop6(ev) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        if ($("#" + data).parent().get(0) != $("#Primljen").get(0)) {
+            ChangePhase(data, "Primljen");
+        }
+        $("#Primljen").prepend($("#" + data));
+    }
+    function drop7(ev) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        if ($("#" + data).parent().get(0) != $("#Odustao").get(0)) {
+            ChangePhase(data, "Odustao");
+        }
+        $("#Odustao").prepend($("#" + data));
+    }
+    function drop8(ev) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        if ($("#" + data).parent().get(0) != $("#Odbijen").get(0)) {
+            ChangePhase(data, "Odbijen");
+        }
+        $("#Odbijen").prepend($("#" + data));
+    }
+
+    var eTable = $("myTable").DataTable();
+    var disabled = '@(ViewData["disablecontrols"])';
+                  if (disabled=='True') {
+                      $('input,select').attr('disabled', disabled);
+                      $('button').attr('disabled', disabled);
+                  }
+</script>

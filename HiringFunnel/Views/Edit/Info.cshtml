@@ -1,0 +1,609 @@
+﻿@model HiringFunnel.DTO.ContactEditView
+
+@using HiringFunnel.DTO;
+
+@{
+    ViewBag.Title = "Contact";
+}
+@{ 
+    SessionLogin user = (SessionLogin)Session["User"];
+}
+
+<style>
+    .normalComment {
+
+    }
+    .activeComment{
+        background-color:#555;
+    }
+</style>
+
+
+
+@{
+    List<TechnologyView> techno = (List<TechnologyView>)TempData["Techno"];
+}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-horizontal">
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group"><h3> Osnovne Informacije</h3></div>
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.FirstName, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.DisplayFor(model => model.FirstName, new { htmlAttributes = new { @class = "form-control" } })
+                          
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.LastName, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.DisplayFor(model => model.LastName, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.DateOfBirth, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.DisplayFor(model => model.DateOfBirth, new { htmlAttributes = new { @class = "form-control", @type = "datetime" } })
+                             
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.DisplayFor(model => model.Location, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4">CV</label>
+                                <div class="col-md-8">
+                                    <a href='@Url.Action("OpenContactCV","Edit",new { Id=Model.Id })' >Open</a>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group"><h3>Kontakt Podaci</h3></div>
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.DisplayFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Phone, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.DisplayFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control" } })
+                     
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.LinkedIn, htmlAttributes: new { @class = "control-label col-md-4" })
+                                <div class="col-md-8">
+                                    @Html.DisplayFor(model => model.LinkedIn, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                            </div>
+                     @if (user.Role != UserLevel.Interviewer)
+                     {
+                            <div class="form-group">
+                                <div class="col-md-8">
+                                    <button data-toggle="modal" data-target="#itemModal">Edit</button>
+                                </div>
+                            </div>
+                     }
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group"><h3>Iskustvo</h3></div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Seniority, htmlAttributes: new { @class = "control-label col-md-4" })
+                            <div class="col-md-8">
+                                @Html.DisplayFor(model => model.Seniority )
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Technologies, htmlAttributes: new { @class = "control-label col-md-4" })
+                            <div class="col-md-8">
+                                <select id="Technologies" name="techno" multiple="multiple" size="5" class="form-control">
+                                    @foreach (TechnologyView tech in Model.Technologies)
+                                    {
+
+                                        <option value=@tech.Id >@tech.Name</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <h3>Istorija zaposljavanja</h3>
+                    <div class="row">
+                        <table class="table" id="myTable1" style="margin-top:4%">
+                            <thead border="1" style="background-color:#555">
+                              
+                                <tr>
+                                    <th>
+                                        Name
+                                    </th>
+                                    <th>
+                                        Technologies
+                                    </th>
+                                    <th>
+                                        Seniority
+                                    </th>
+                                    <th>
+                                        StartDate
+                                    </th>
+
+
+                                    <th>Edit</th>
+
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+
+
+
+                </div>
+            </div>
+            <div class="col-md-6">
+                 @using (Html.BeginForm("AddContactComment","Edit",FormMethod.Post))
+                {
+                     <input type="hidden" name="RecvId" value=@Model.Id  />
+                <div>
+                    <h3>Komentar</h3>
+                    <textarea name="Message" style="width:50%"></textarea>
+                  </div>
+                <div style="width:50%">
+                    @if (user.Role != UserLevel.Interviewer) {
+                    <input type="checkbox" name="visHide" value="1"/><span>Sakrij </span>
+                                }
+
+
+                        <button type="submit" style="float:right">Sacuvaj</button>
+                    </div>
+                 }
+                <div style="width:100%;margin-top:4%">
+                    <button class="normalComment" type="submit" style="float:left" id="all" name="all" onclick='comHidden(this)' value="1" > Komentari</button>
+                     @if (user.Role != UserLevel.Interviewer)
+                     {
+                    <button class="normalComment" style="float:left" id="hidden" name="hidden" onclick='comHidden(this)' value="0" > Sakriveni Komentari</button>
+                     }
+                    <input type="hidden" name="com" value="1" id="com" />
+                    
+                    <table id="myTable" style="margin-top:4%;width:100%">
+                        <thead border="1" style="background-color:#555;width:100%">    
+                            <tr>
+                                <th style="width:20%;overflow:hidden">
+                                    Message
+                                </th>
+                               
+                                <th>
+                                    AuthorName
+                                </th>
+                                <th>
+                                   Time
+                                </th>
+                                <th>
+                                    Details
+                                </th>
+                                <th>
+                                    Delete
+                                </th>
+
+                            </tr>
+                        </thead>
+
+
+                    </table>
+                </div>
+              
+            </div>
+
+        </div>
+    </div>
+
+@if (user.Role != UserLevel.Interviewer)
+{
+<div class="modal modal-scroll fade" id="itemModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+@using (Html.BeginForm("Info","Edit", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+            <div class="modal-header">
+                <div>
+                    <h4 class="modal-title item-name" style="text-align: center; margin-bottom: 0%; font-weight: 900">Azuriraj Korisnika</h4>
+                </div>
+            </div>
+            <div class="modal-body">
+               
+                    @Html.AntiForgeryToken()
+
+                    <div class="container">
+
+                        <div class="form-horizontal">
+
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                            @Html.HiddenFor(model => model.Id)
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group"><h4> Osnovne Informacije</h4></div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.FirstName, htmlAttributes: new { @class = "control-label col-md-4" })
+                                        <div class="col-md-8">
+                                            @Html.EditorFor(model => model.FirstName, new { htmlAttributes = new { @class = "form-control" } })
+                                            @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.LastName, htmlAttributes: new { @class = "control-label col-md-4" })
+                                        <div class="col-md-8">
+                                            @Html.EditorFor(model => model.LastName, new { htmlAttributes = new { @class = "form-control" } })
+                                            @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.DateOfBirth, htmlAttributes: new { @class = "control-label col-md-4" })
+                                        <div class="col-md-8">
+                                            @*@Html.EditorFor(model => model.DateOfBirth, new { htmlAttributes = new { @class = "form-control", @type = "datetime" } })*@
+                                            <input type="datetime" class="form-control" name="DateOfBirth" id="DateOfBirth" value='@Model.DateOfBirth.ToShortDateString()' />
+                                            @Html.ValidationMessageFor(model => model.DateOfBirth, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "control-label col-md-4" })
+                                        <div class="col-md-8">
+                                            @Html.EditorFor(model => model.Location, new { htmlAttributes = new { @class = "form-control" } })
+                                            @Html.ValidationMessageFor(model => model.Location, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class = "control-label col-md-5" >Uload Cv</label>
+                                        <div class="col-md-7">
+                                            <input type="file" name="CV" />
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group"><h4>Kontakt Podaci</h4></div>
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label col-md-4" })
+                                        <div class="col-md-8">
+                                            @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
+                                            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.Phone, htmlAttributes: new { @class = "control-label col-md-4" })
+                                        <div class="col-md-8">
+                                            @Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control" } })
+                                            @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.LinkedIn, htmlAttributes: new { @class = "control-label col-md-4" })
+                                        <div class="col-md-8">
+                                            @Html.EditorFor(model => model.LinkedIn, new { htmlAttributes = new { @class = "form-control" } })
+                                            @Html.ValidationMessageFor(model => model.LinkedIn, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group"><h4>Iskustvo</h4></div>
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Seniority, htmlAttributes: new { @class = "control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        <select name="Seniority" id="Seniority" class="form-control">
+                                            <option value="0" @(Model.Seniority == SeniorityLevel.Entry ? "selected" : "")>Entry</option>
+                                            <option value="1" @(Model.Seniority == SeniorityLevel.Junior ? "selected" : "")>Junior</option>
+                                            <option value="2" @(Model.Seniority == SeniorityLevel.Medior ? "selected" : "")>Medior</option>
+                                            <option value="5" @(Model.Seniority == SeniorityLevel.Senior ? "selected" : "")>Senior</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Technologies, htmlAttributes: new { @class = "control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        <select id="Technologies" name="techno" multiple="multiple" size="5" class="form-control">
+                                            @foreach (TechnologyView tech in techno)
+                                            {
+                                                bool pom = false;
+                                                if (Model.Technologies.Where(x => x.Id == tech.Id).SingleOrDefault() != null)
+                                                {
+                                                    pom = true;
+                                                }
+
+                                                <option value=@tech.Id selected=@(pom ? true : false)>@tech.Name</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+
+                        </div>
+
+                    </div>
+                
+            </div>
+            <div class="modal-footer">
+                
+                <input type="submit" value="Submit" />
+            </div>
+}
+        </div>
+    </div>
+</div>
+}
+
+
+<div class="modal modal-scroll fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h4 class="modal-title item-name" style="text-align: center; margin-bottom: 0%; font-weight: 900">Update Comment</h4>
+                </div>
+            </div>
+           @using (Html.BeginForm("UpdateComment", "Edit", FormMethod.Post))
+            {
+            <input type="hidden" name="Id" value='@Model.Id' />
+            <div class="modal-body">
+              
+                <div id="editDetails" style="text-align:center">
+      
+                    
+                 
+                </div>
+            </div>
+            <div id="modalEdit" class="modal-footer">
+
+            </div>
+                }
+        </div>
+    </div>
+</div>
+
+
+<div class="modal modal-scroll fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h4 class="modal-title item-name" style="text-align: center; margin-bottom: 0%; font-weight: 900">Delete Comment</h4>
+                </div>
+            </div>
+                <div class="modal-body">
+
+                    <div id="deleteDetails" style="text-align:center">
+
+
+
+                    </div>
+                </div>
+                <div id="modalDelete" class="modal-footer">
+
+                </div>
+            
+        </div>
+    </div>
+</div>
+
+
+
+<script src="~/Scripts/DataTables/jquery.dataTables.js"></script>
+<link rel="stylesheet" type="text/css" href="~/Content/DataTables/css/jquery.dataTables.css">
+<script>
+
+    $(document).ready(function () {
+
+        var User =@Html.Raw(Json.Encode(user));
+
+        $('#myTable').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "orderMulti": false,
+            "dom": '<"top"i>rt<"bottom"lp><"clear">',
+            "aLengthMenu": [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]],
+      
+        
+            "ajax": {
+                "url": '@Url.Action("LoadContactComment","Edit")',
+                "type": "POST",
+                "datatype": "json",
+                "data": function (d) {
+                    d.Id = '@Model.Id';
+                    d.comment = $('#com').val();
+                }
+            },
+            "destroy": true,
+
+            "columns": [
+
+                { "data": "Message", "name": "Message", "autoWidth": true },
+                { "data": "AuthorName", "name": "AuthorName", "autoWidth": true },
+                { "data": "Time", "name": "Time", "autoWidth": true },
+                {
+                    "render": function (data, type, row) {
+                        if (User.Role == 0)
+                            return "";
+                        return "<button onclick='modalComment(event,this)' id=" + row.Id + " data-toggle='modal' data-target='#messageModal'>Edit</button>";
+                    }
+                },
+                {
+                    "render": function (data, type, row) {
+                        if (User.Role == 0)
+                            return "";
+                        return "<button onclick='modalDeleteComment(event,this)' id=" + row.Id + " >Delete</button>";
+                    }
+                }
+
+            ]
+
+
+        });
+
+        $('#myTable1').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "orderMulti": false,
+            columnDefs: [{
+                targets: "datatable-nosort",
+                orderable: false
+            }],
+            "dom": '<"top"i>rt<"bottom"lp><"clear">',
+            "aLengthMenu": [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]],
+            "ajax": {
+                "url":'@Url.Action("LoadContactHistory", "Home")',
+                "type": "POST",
+                "datatype": "json",
+                "data": function (d) {
+                    d.Id = '@Model.Id';
+                }
+            },
+            "columns": [
+
+                { "data": "Name", "name": "Name", "autoWidth": true },
+                { "data": "Technologies", "name": "Technologies", "autoWidth": true },
+                { "data": "Seniority", "name": "Seniority", "autoWidth": true },
+                { "data": "StartDate", "name": "Technologies", "autoWidth": true },
+
+                {
+
+
+                    'render': function (data, type, row) {
+
+                        if (!row.isEnd) {
+
+                            return "<a href=@Url.Action("EditContactInProcess", "Process")/?id=" + row.pInsContact + " value=" + row.Id + " id=" + row.Id + " >Edit</a>";
+                        }
+                        else {
+                            return "";
+                        }
+                    }
+                }
+            ]
+
+
+        });
+
+        $("#all").toggleClass("activeComment");
+        eTable = $('#myTable').DataTable();
+
+        modalComment = function (event, ele) {
+
+            event.stopPropagation();
+            var roww = $(ele).parents('tr')[0]
+            var data = eTable.row(roww).data();
+            var x = $('#editDetails');
+            var y = $('#modalEdit');
+            y.empty();
+            x.empty();
+            x.append("<hr><input type='hidden' name='commentId' value=" + data.Id + " ><textarea id='modalMsg' style='width:100%;height:50%' name='modalMsg'  >" + data.Message + " </textarea><br>Author: <span id='modalAuthor'>" + data.AuthorName + "</span><br />Time: <span id='modalTime' name='modalTime'>" + data.Time + "</span><hr />");
+            y.append("<input type='submit' value='Edit' />");
+            $('#messageModal').modal('show');
+        }
+
+
+
+        modalDeleteComment = function (event, ele) {
+            event.stopPropagation();
+            var roww = $(ele).parents('tr')[0]
+            var data = eTable.row(roww).data();
+            var x = $('#deleteDetails');
+            var y = $('#modalDelete');
+            y.empty();
+            x.empty();
+            x.append("<hr><p id='modalMsg' name='modalMsg' style='word-wrap: break-word' >" + data.Message + " </p><br>Author: <span id='modalAuthor'>" + data.AuthorName + "</span><br />Time: <span id='modalTime' name='modalTime'>" + data.Time + "</span><hr />");
+            x.append("Dali ste sigurni da zelite da izbrisete komentar ?")
+            y.append("<button onclick='deleteeComment("+ data.Id +")' >Delete </button>");
+            $('#deleteModal').modal('show');
+
+        }
+
+        deleteeComment = function (data) {
+            console.log(data);
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                data: { "Id": data },
+                cache: false,
+                url: '@Url.Action("DeleteComment","Edit")',
+                success: function (obj) {
+                    console.log("aaaaaa");
+                    $('#myTable').DataTable().ajax.reload().draw();
+                }
+
+            });
+
+            $('#myTable').DataTable().ajax.reload().draw();
+            $('#deleteModal').modal('hide');
+
+        }
+        if (User.Role != 0) {
+            $('#myTable1 tbody').on('click', 'tr', function () {
+
+                var data = $('#myTable1').DataTable().row(this).data();
+                window.location.href = '@Url.Action("EditProcess", "Process")/?id=' + data.Id;
+            });
+        }
+
+
+        
+            $('#myTable tbody').on('click', 'tr', function () {
+
+                var data = eTable.row(this).data();
+
+                var x = $('#editDetails');
+                var y = $('#modalEdit');
+                y.empty();
+                x.empty();
+                x.append("<hr><p id='modalMsg' name='modalMsg' style='word-wrap: break-word' >" + data.Message + " </p><br>Author: <span id='modalAuthor'>" + data.AuthorName + "</span><br />Time: <span id='modalTime' name='modalTime'>" + data.Time + "</span><hr />");
+                $('#messageModal').modal('show');
+            });
+        
+
+
+
+
+    });
+
+
+    function comHidden(event) {
+        $("#all").removeClass("normalComment");
+        $("#hidden").removeClass("normalComment");
+        $("#all").removeClass("activeComment");
+        $("#hidden").removeClass("activeComment");
+        $("#"+event.id).toggleClass("activeComment");
+        $('#com').val(event.value);
+        $('#myTable').DataTable().ajax.reload().draw();
+    }
+
+</script>
+
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

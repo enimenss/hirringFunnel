@@ -1,0 +1,425 @@
+﻿@model HiringFunnel.DTO.ContactView
+
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+@using HiringFunnel.DTO;
+
+
+@{
+    ViewBag.Title = "ContactManagement";
+}
+
+@{
+    List<TechnologyView> techno = (List<TechnologyView>)TempData["Techno"];
+}
+
+<style>
+    body {
+        width: 100%;
+    }
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        max-width: 300px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+        padding: 0;
+        margin: auto;
+    }
+
+    .show {
+        display: block;
+    }
+</style>
+<div class="container">
+    <div class="row">
+
+        <div class="col-md-2" style="height:100%"></div>
+        <div class="col-md-8" style="margin-top:3%;text-align:center;height:50%">
+            <table id="myTable" style="margin-top:4%;width:20%">
+                <thead border="1" style="background-color:#555">
+                    <tr>
+                        <td>
+                            <input type="text" placeholder="FirstName" id="tFirstName" style="width:100%" />
+                        </td>
+                        <td>
+                            <input type="text" placeholder="LastName" id="tLastName" style="width:100%" />
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            @*<input type="text" placeholder="Seniority" id="tSeniority" style="width:100%" />*@
+                            <select id="tSeniority">
+                                <option value='' selected>Seniority</option>
+                                <option value="Entry">Entry</option>
+                                <option value="Junior">Junior</option>
+                                <option value="Medior">Medior</option>
+                                <option value="Senior">Senior</option>
+                            </select>
+                        </td>
+                        <td>
+                            @*<input type="text" placeholder="Tehnologies" id="tTechnologies" style="width:100%" />*@
+                            <select id="tTechnologies">
+                                <option value="" selected>Technology</option>
+                                @foreach (var tech in techno)
+                                {
+                                    <option value='@tech.Name'>@tech.Name</option>
+                                }
+                            </select>
+                        </td>
+                        <td><input type="button" value="Search" id="btnSearch" style="width:100%" /></td>
+                    </tr>
+                    <tr>
+                        <th>
+                            FirstName
+                        </th>
+                        <th>
+                            LastName
+                        </th>
+                        <th>
+                            Email
+                        </th>
+                        <th>
+                            Phone
+                        </th>
+                        <th>
+                            Seniority
+                        </th>
+                        <th>Technologies</th>
+
+                        <th>Add In Process</th>
+
+                        <th>Edit</th>
+                        <th>Delete</th>
+
+
+                    </tr>
+                </thead>
+
+
+            </table>
+
+
+
+
+            @using (Html.BeginForm("ContactManagement","Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                <div id="show" style="display:none">
+                    @*<form action="/Register/Index" method="post">*@
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-inline">
+                        <h4 id="Mode">Dodaj Novog Kontakta</h4>
+                        <hr />
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div style="float:left;margin-right:3%">
+                                    <div class="form-group">
+
+                                        <label class="control-label col-md-4">FirstName</label>
+                                        <div class="col-md-8">
+
+                                            <input type="text" id="FirstName" name="FirstName" class="form-control" />
+                                            @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "text-danger" })
+
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+
+                                        <label class="control-label col-md-4">LastName</label>
+                                        <div class="col-md-8">
+
+                                            <input type="text" id="LastName" name="LastName" class="form-control" />
+                                            @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text-danger" })
+
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+
+                                        <label class="control-label col-md-4">Phone</label>
+                                        <div class="col-md-8">
+
+                                            <input type="text" id="Phone" name="Phone" class="form-control" />
+
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+
+                                        <label class="control-label col-md-4">Location</label>
+                                        <div class="col-md-8">
+
+                                            <input type="text" id="Location" name="Location" class="form-control" />
+
+                                        </div>
+                                    </div>
+
+
+
+
+                                    <div class="form-group">
+                                        <label class="control-label col-md-4" style="float:left">Seniority</label>
+                                        <div class="col-md-8">
+                                            <select name="Seniority" id="Seniority">
+                                                <option value="0">Entry</option>
+                                                <option value="1">Junior</option>
+                                                <option value="2">Medior</option>
+                                                <option value="5">Senior</option>
+                                            </select>
+                                        </div>
+
+                                    </div>
+
+                                    
+
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+
+                                    <label class="control-label col-md-4">Email</label>
+                                    <div class="col-md-8">
+
+                                        <input type="text" id="Email" name="Email" class="form-control" />
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+
+                                    <label class="control-label col-md-4">DateOfBirth</label>
+                                    <div class="col-md-8">
+
+                                        <input type="datetime" id="DateOfBirth" name="DateOfBirth" class="form-control" />
+
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-5">Uload Cv</label>
+                                    <div class="col-md-7">
+                                        <input type="file" name="CV" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+
+                                    <div class="col-md-10">
+                                        <select id="Technologies" name="techno" multiple="multiple" size="4">
+                                            @foreach (TechnologyView tech in techno)
+                                            {
+                                                <option value=@tech.Id>@tech.Name</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-offset-4 col-md-8">
+                                        <input id="c_u" type="submit" value="Create" class="btn btn-default" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+
+        </div>
+        <div class="col-md-2"><button onclick="Show()" style="margin-top:10%;text-align:center">DodajKontakta</button></div>
+    </div>
+</div>
+
+<div class="modal modal-scroll fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h4 class="modal-title item-name" style="text-align: center; margin-bottom: 0%; font-weight: 900">Delete Comment</h4>
+                </div>
+            </div>
+            <div class="modal-body">
+
+                <div id="deleteDetails" style="text-align:center">
+                    <span>Dali ste sigurni da zelite da obrisete kontakta:</span>&nbsp;<span id="kontakt"></span>
+                </div>
+            </div>
+            <div id="modalDelete" class="modal-footer">
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="~/Scripts/DataTables/jquery.dataTables.js"></script>
+<link rel="stylesheet" type="text/css" href="~/Content/DataTables/css/jquery.dataTables.css">
+
+<script>
+    $(document).ready(function () {
+
+        var error =@Html.Raw(Json.Encode(ViewBag.Error));
+
+        $('#myTable').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "orderMulti": false,
+            "dom": '<"top"i>rt<"bottom"lp><"clear">',
+            "aLengthMenu": [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]],
+            "ajax": {
+                "url": "LoadContactData",
+                "type": "POST",
+                "datatype": "json"
+            },
+            "columns": [
+
+                { "data": "FirstName", "name": "FirstName", "autoWidth": true },
+                { "data": "LastName", "name": "LastName", "autoWidth": true },
+                { "data": "Email", "name": "Email", "autoWidth": true },
+                { "data": "Phone", "name": "Phone", "autoWidth": true },
+                { "data": "Seniority", "name": "Seniority", "autoWidth": true },
+                { "data": "Technologies", "name": "Technologies", "autoWidth": true },
+
+                {
+
+                    'render': function (data, type, row) {
+
+
+                        return "<button type='button' onclick='addInProcess(this.value)'  name='prosledi' value=" + row.Id + " >Dodaj u Proces</button><div id=" + row.Id + " class='dropdown-content'></div>";
+                    }
+                },
+
+
+                {
+
+
+                    'render': function (data, type, row) {
+
+
+                        return "<a href=@Url.Action("Info","Edit")/?id="+row.Id+ " type='submit' name='Id' value=" + row.Id + " id=" + row.Id + " >Edit</a>";
+                    }
+                },
+
+                {
+                    'render': function (data, type, row) {
+
+
+                        return "<button type='button' onclick='DeleteContact(this)' value=" + row.Id + " data-toggle='modal' data-target='#deleteModal' >Delete</button>";
+                    }
+
+
+                }
+            ]
+
+
+        });
+
+        eTable = $('#myTable').DataTable();
+        $('#btnSearch').click(function () {
+            eTable.columns(0).search($('#tFirstName').val().trim());
+            eTable.columns(1).search($('#tLastName').val().trim());
+            eTable.columns(4).search($('#tSeniority option:selected').val().trim());
+            eTable.columns(5).search($('#tTechnologies option:selected').val().trim());
+            eTable.draw();
+        });
+
+        //vrati = function (event) {
+        //    var roww = $("#"+event.id).parents('tr')[0]
+        //    var data = eTable.row(roww).data();
+        //    console.log(data);
+        //    eTable.row(roww).node().remove();
+        //    eTable.draw();
+        //}
+
+        if (error != undefined || error != null) {
+            x = document.getElementById('show');
+            x.style.display = 'block';
+        }
+    });
+
+
+    function Show() {
+        var x = document.getElementById('show');
+
+        x.style.display = 'block';
+
+    }
+
+     var addInProcess = function (ContactId) {
+
+
+        document.getElementById(ContactId).classList.toggle("show");
+
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            data: { "ContactId": ContactId },
+            cache: false,
+            url: '@Url.Action("GetAllNotContactProcess", "Home")',
+            success: function (obj) {
+
+                var drop = $("#" + ContactId);
+                drop.empty();
+
+                var y = $("<span></span>");
+                var x = $("<select id='allProcess'></select>");
+                y.append(x);
+                drop.append(y);
+                console.log(x);
+                $.each(obj.data, function (i, f) {
+                    x.append("<option value=" + f.Id + ">" + f.Name + "</option>");
+                }
+
+                );
+                drop.append("<span><button onclick='AddInProc("+ContactId+")' type='button' >Dodaj</button></span>");
+
+            }
+        });
+    }
+
+    AddInProc = function (ContactId) {
+        var ProcId = $("#allProcess :selected");
+         $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                data: { "ProcessId": ProcId.val(), "ContactId": ContactId },
+                cache: false,
+                url: '@Url.Action("Dodaj","Process")',
+                success: function (obj) {
+                    ProcId.remove();
+                }
+
+            });
+     }
+
+    var DeleteContact = function (element) {
+            var ele = $(element);
+            var roww =ele.parents('tr')[0]
+            var data = $('#myTable').DataTable().row(roww).data();
+            var Kontakt = $("#kontakt");
+            var Delete = $("#modalDelete");
+            Kontakt.empty();
+            Delete.empty();
+            Kontakt.text(data.FirstName);
+            Delete.append("<button  type='button' onclick='DeleteContactAjax(this.value)' value="+data.Id+">Delete</button>")
+        }
+
+        var DeleteContactAjax = function (Id) {
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                data: { "Id": Id },
+                cache: false,
+                url: '@Url.Action("DeleteContact","Home")',
+                success: function (obj) {
+                    $('#myTable').DataTable().ajax.reload().draw();
+                    $('#deleteModal').modal('hide');
+                }
+
+            });
+        }
+
+
+</script>

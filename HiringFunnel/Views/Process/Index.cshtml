@@ -1,0 +1,433 @@
+﻿@model HiringFunnel.DTO.ProcessView
+@using HiringFunnel.DTO;
+
+@{
+    ViewBag.Title = "ProcessManagement";
+}
+@{
+    List<TechnologyView> techno = (List<TechnologyView>)TempData["Techno"];
+}
+
+
+<style>
+
+    body {
+        height: 100%;
+        width: 100%;
+    }
+    a {
+        color: inherit;
+    }
+
+        a:hover {
+            color: blue;
+        } 
+
+    hr {
+        display: block;
+        position: relative;
+        padding: 0;
+        margin: 8px auto;
+        height: 0;
+        width: 100%;
+        max-height: 0;
+        font-size: 1px;
+        line-height: 0;
+        clear: both;
+        border: none;
+        border-top: 1px solid #aaaaaa;
+        border-bottom: 1px solid #ffffff;
+    }
+
+    .container {
+        width: 100%;
+    }
+
+    .cont {
+        width: 100%;
+        margin: auto;
+        height: 320px;
+        border: 1px solid black;
+        padding-bottom:2%;
+    }
+
+    .column {
+        width: 11.5%;
+        display: inline-block;
+        /*float: left;*/
+        margin: 0.3%;
+        padding-bottom:2%;
+        height: 280px;
+        overflow-y: scroll;
+        border: 1px solid black;
+    }
+
+    .forLabel {
+        width: 11.5%;
+        margin: 0.3%;
+    }
+
+    .kontact {
+        width: 93%;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 5%;
+        margin-top: 5%;
+        min-height: 50px;
+        border: 1px solid black;
+        word-wrap: break-word
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 200px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+        padding: 0;
+        margin: auto;
+    }
+
+    .show {
+        display: block;
+    }
+</style>
+@*<div class="container">*@
+<div style="width:100%;margin-top:2%">
+    <div class="dropdown" style="float:right">
+        <button onclick="Show()">Kreiraj Proces</button>
+        <div id="myDropdown" class="dropdown-content">
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="form-horizontal">
+                 
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Seniority, htmlAttributes: new { @class = "control-label col-md-4" })
+                        <div class="col-md-8">
+                            <select name="Seniority" id="Seniority">
+                                <option value="0">Entry</option>
+                                <option value="1">Junior</option>
+                                <option value="2">Medior</option>
+                                <option value="5">Senior</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Technologies, htmlAttributes: new { @class = "control-label col-md-6" })
+                        <div class="col-md-6">
+                            <select id="Technologies" name="Technologies" >
+                                @foreach (TechnologyView tech in techno)
+                                {
+                                    <option value=@tech.Name>@tech.Name</option>
+                                }
+                            </select>
+
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <div class="col-md-offset-4 col-md-8">
+                            <input type="submit" value="Create" class="btn btn-default" />
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<h3>Aktivni procesi</h3>
+    <div class="cont">
+
+        <label class="forLabel">Kontakt</label>
+        <label class="forLabel">Intervju</label>
+        <label class="forLabel">Test</label>
+        <label class="forLabel">Odbrana</label>
+        <label class="forLabel">Ponuda</label>
+        <label class="forLabel">Primljen</label>
+        <label class="forLabel">Odustao</label>
+        <label class="forLabel">Odbijen</label>
+
+
+
+
+
+        <div id="Kontakt" ondrop="drop1(event)" ondragover="allowDrop(event)" class="column"></div>
+        <div id="Intervju" ondrop="drop2(event)" ondragover="allowDrop(event)" class="column"></div>
+        <div id="Test" ondrop="drop3(event)" ondragover="allowDrop(event)" class="column"></div>
+        <div id="Odbrana" ondrop="drop4(event)" ondragover="allowDrop(event)" class="column"></div>
+        <div id="Ponuda" ondrop="drop5(event)" ondragover="allowDrop(event)" class="column"></div>
+        <div id="Primljen" ondrop="drop6(event)" ondragover="allowDrop(event)" class="column"></div>
+        <div id="Odustao" ondrop="drop7(event)" ondragover="allowDrop(event)" class="column"></div>
+        <div id="Odbijen" ondrop="drop8(event)" ondragover="allowDrop(event)" class="column"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <table class="table" id="myTable" style="margin-top:4%">
+                <thead border="1" style="background-color:#555">
+                    <tr>
+                        <td>
+                            <input type="text" placeholder="FirstName" id="tName" style="width:100%" />
+                        </td>
+
+                        <td>
+                            @*<input type="text" placeholder="Tehnologies" id="tTechnologies" style="width:100%" />*@
+                            <select id="tTechnologies">
+                                <option value="" selected>Technology</option>
+                                @foreach (var tech in techno)
+                                {
+                                    <option value='@tech.Name'>@tech.Name</option>
+                                }
+                            </select>
+                        </td>
+
+                        <td>
+                            @*<input type="text" placeholder="Seniority" id="tSeniority" style="width:100%" />*@
+                            <select id="tSeniority">
+                                <option value='' selected>Seniority</option>
+                                <option value="Entry">Entry</option>
+                                <option value="Junior">Junior</option>
+                                <option value="Medior">Medior</option>
+                                <option value="Senior">Senior</option>
+                            </select>
+                        </td>
+
+                        <td><input type="button" value="Search" id="btnSearch" style="width:100%" /></td>
+                    </tr>
+                    <tr>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Technologies
+                        </th>
+                        <th>
+                            Seniority
+                        </th>
+                        <th>
+                            StartDate
+                        </th>
+
+
+                        <th>Edit</th>
+
+                    </tr>
+                </thead>
+            </table>
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+@*</div>*@
+
+<script src="~/Scripts/DataTables/jquery.dataTables.js"></script>
+<link rel="stylesheet" type="text/css" href="~/Content/DataTables/css/jquery.dataTables.css">
+
+
+<script>
+
+    $(document).ready(function () {
+        $('#myTable').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "orderMulti": false,
+            columnDefs: [{
+                targets: "datatable-nosort",
+                orderable: false
+            }],
+            "dom": '<"top"i>rt<"bottom"lp><"clear">',
+            "aLengthMenu": [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]],
+            "ajax": {
+                "url":'@Url.Action("LoadProcessData", "Process")',
+                "type": "POST",
+                "datatype": "json"
+            },
+            "columns": [
+
+                { "data": "Name", "name": "Name", "autoWidth": true },
+                { "data": "Technologies", "name": "Technologies", "autoWidth": true },
+                { "data": "Seniority", "name": "Seniority", "autoWidth": true },
+                { "data": "StartDate", "name": "StartDate", "autoWidth": true },
+
+                {
+
+
+                    'render': function (data, type, row) {
+
+
+                        return "<a href=@Url.Action("EditProcess","Process")/?id=" + row.Id + " value=" + row.Id + " id=" + row.Id + " >"+(row.isEnd?'Details':'Edit')+"</a>";
+                    }
+                }
+            ]
+
+
+        });
+
+        eTable = $('#myTable').DataTable();
+        $('#btnSearch').click(function () {
+            eTable.columns(0).search($('#tName').val().trim());
+            eTable.columns(1).search($('#tSeniority option:selected').val().trim());
+            eTable.columns(2).search($('#tTechnologies option:selected').val().trim());
+            eTable.draw();
+        });
+
+
+        Show = function () {
+            document.getElementById("myDropdown").classList.toggle("show");
+        }
+
+
+         $.ajax({
+        type: 'POST',
+        dataType: 'json',
+        data: {  },
+        cache: false,
+        url: '@Url.Action("GetInstancesData", "Process")',
+        success: function (obj) {
+
+            $.each(obj.data.Contacts, function (i, f) {
+
+                $('#Kontakt').append("<div class='kontact' id=" + f.Id + " draggable='true' ondragstart='drag(event)' ><a href=@Url.Action("EditContactInProcess","Process")/?id=" + f.Id + " ><p>" + f.ContactName + "</p><hr><p>" + f.ProcessName + "</p><p>" + f.ContactTechnologies +"</p></a></div>")
+            });
+            $.each(obj.data.Interviews, function (i, f) {
+
+                $('#Intervju').append("<div class='kontact' id=" + f.Id + " draggable='true' ondragstart='drag(event)' ><a href=@Url.Action("EditContactInProcess","Process")/?id=" + f.Id + " ><p>" + f.ContactName + "</p><hr><p>" + f.ProcessName + "</p><p>" + f.ContactTechnologies +"</p></a></div>")
+            });
+            $.each(obj.data.Tests, function (i, f) {
+
+                $('#Test').append("<div class='kontact' id=" + f.Id + " draggable='true' ondragstart='drag(event)' ><a href=@Url.Action("EditContactInProcess","Process")/?id=" + f.Id + " ><p>" + f.ContactName + "</p><hr><p>" + f.ProcessName + "</p><p>" + f.ContactTechnologies +"</p></a></div>")
+            });
+
+            $.each(obj.data.TestDefenses, function (i, f) {
+
+                $('#Odbrana').append("<div class='kontact' id=" + f.Id + " draggable='true' ondragstart='drag(event)' ><a href=@Url.Action("EditContactInProcess","Process")/?id=" + f.Id + " ><p>" + f.ContactName + "</p><hr><p>" + f.ProcessName + "</p><p>" + f.ContactTechnologies +"</p></a></div>")
+            });
+            $.each(obj.data.Offers, function (i, f) {
+
+                $('#Ponuda').append("<div class='kontact' id=" + f.Id + " draggable='true' ondragstart='drag(event)' ><a href=@Url.Action("EditContactInProcess","Process")/?id=" + f.Id + " ><p>" + f.ContactName + "</p><hr><p>" + f.ProcessName + "</p><p>" + f.ContactTechnologies +"</p></a></div>")
+            });
+            $.each(obj.data.Accepts, function (i, f) {
+
+                $('#Primljen').append("<div class='kontact' id=" + f.Id + " draggable='true' ondragstart='drag(event)' ><a href=@Url.Action("EditContactInProcess","Process")/?id=" + f.Id + " ><p>" + f.ContactName + "</p><hr><p>" + f.ProcessName + "</p><p>" + f.ContactTechnologies +"</p></a></div>")
+            });
+            $.each(obj.data.Rejects, function (i, f) {
+
+                $('#Odbijen').append("<div class='kontact' id=" + f.Id + " draggable='true' ondragstart='drag(event)' ><a href=@Url.Action("EditContactInProcess","Process")/?id=" + f.Id + " ><p>" + f.ContactName + "</p><hr><p>" + f.ProcessName + "</p><p>" + f.ContactTechnologies +"</p></a></div>")
+            });
+            $.each(obj.data.Quits, function (i, f) {
+
+                $('#Odustao').append("<div class='kontact' id=" + f.Id + " draggable='true' ondragstart='drag(event)' ><a href=@Url.Action("EditContactInProcess","Process")/?id=" + f.Id + " ><p>" + f.ContactName + "</p><hr><p>" + f.ProcessName + "</p><p>" + f.ContactTechnologies +"</p></a></div>")
+            });
+        }
+    });
+    });
+
+
+    function allowDrop(ev) {
+        ev.preventDefault();
+    }
+
+      var ChangePhase = function (Id,Phase) {
+        $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                data: { "Instance":Id , "Phase":Phase },
+                cache: false,
+                url: '@Url.Action("ChangePhase","Process")',
+                success: function (obj) {
+                }
+
+            });
+    }
+
+
+      function drag(ev) {
+          ev.dataTransfer.setData("text", ev.target.id);
+      }
+
+      function drop1(ev) {
+          ev.preventDefault();
+
+
+          var data = ev.dataTransfer.getData("text");
+          if ($("#" + data).parent().get(0) != $("#Kontakt").get(0)) {
+              ChangePhase(data, "Kontakt");
+          }
+          $("#Kontakt").prepend($("#" + data));
+      }
+
+      function drop2(ev) {
+          ev.preventDefault();
+          var data = ev.dataTransfer.getData("text");
+          if ($("#" + data).parent().get(0) != $("#Intervju").get(0)) {
+              ChangePhase(data, "Intervju");
+          }
+
+          $("#Intervju").prepend($("#" + data));
+      }
+      function drop3(ev) {
+          ev.preventDefault();
+          var data = ev.dataTransfer.getData("text");
+          if ($("#" + data).parent().get(0) != $("#Test").get(0)) {
+              ChangePhase(data, "Test");
+          }
+          $("#Test").prepend($("#" + data));
+      }
+
+
+      function drop4(ev) {
+          ev.preventDefault();
+          var data = ev.dataTransfer.getData("text");
+          if ($("#" + data).parent().get(0) != $("#Odbrana").get(0)) {
+              ChangePhase(data, "Odbrana");
+          }
+          $("#Odbrana").prepend($("#" + data));
+      }
+      function drop5(ev) {
+          ev.preventDefault();
+          var data = ev.dataTransfer.getData("text");
+          if ($("#" + data).parent().get(0) != $("#Ponuda").get(0)) {
+              ChangePhase(data, "Ponuda");
+          }
+          $("#Ponuda").prepend($("#" + data));
+      }
+      function drop6(ev) {
+          ev.preventDefault();
+          var data = ev.dataTransfer.getData("text");
+          if ($("#" + data).parent().get(0) != $("#Primljen").get(0)) {
+              ChangePhase(data, "Primljen");
+          }
+          $("#Primljen").prepend($("#" + data));
+      }
+      function drop7(ev) {
+          ev.preventDefault();
+          var data = ev.dataTransfer.getData("text");
+          if ($("#" + data).parent().get(0) != $("#Odustao").get(0)) {
+              ChangePhase(data, "Odustao");
+          }
+          $("#Odustao").prepend($("#" + data));
+      }
+      function drop8(ev) {
+          ev.preventDefault();
+          var data = ev.dataTransfer.getData("text");
+          if ($("#" + data).parent().get(0) != $("#Odbijen").get(0)) {
+              ChangePhase(data, "Odbijen");
+          }
+          $("#Odbijen").prepend($("#" + data));
+      }
+
+
+</script>

@@ -1,0 +1,163 @@
+﻿
+@{
+    ViewBag.Title = "Interviewer";
+}
+
+<h2>Interviewer</h2>
+
+<style>
+    body {
+        height: 100%;
+        width: 100%;
+    }
+
+    a {
+        color: inherit;
+    }
+
+        a:hover {
+            color: blue;
+        }
+
+    hr {
+        display: block;
+        position: relative;
+        padding: 0;
+        margin: 8px auto;
+        height: 0;
+        width: 100%;
+        max-height: 0;
+        font-size: 1px;
+        line-height: 0;
+        clear: both;
+        border: none;
+        border-top: 1px solid #aaaaaa;
+        border-bottom: 1px solid #ffffff;
+    }
+
+    .container {
+        width: 100%;
+    }
+
+    .cont {
+        width: 100%;
+        margin: auto;
+        height: 320px;
+        border: 1px solid black;
+    }
+
+    .column {
+        width: 11.5%;
+        display: inline-block;
+        /*float: left;*/
+        margin: 0.3%;
+        height: 280px;
+        overflow-y: scroll;
+        border: 1px solid black;
+    }
+
+    .forLabel {
+        width: 11.5%;
+        margin: 0.3%;
+    }
+
+    .kontact {
+        width: 93%;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 5%;
+        margin-top: 5%;
+        min-height: 50px;
+        border: 1px solid black;
+        word-wrap: break-word
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 200px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+        padding: 0;
+        margin: auto;
+    }
+
+    .show {
+        display: block;
+          }
+</style>
+
+
+
+<h3>Kontakti</h3>
+<div class="cont">
+
+    <label class="forLabel">Kontakt</label>
+    <label class="forLabel">Intervju</label>
+    <label class="forLabel">Test</label>
+    <label class="forLabel">Odbrana</label>
+    <label class="forLabel">Ponuda</label>
+    <label class="forLabel">Primljen</label>
+    <label class="forLabel">Odustao</label>
+    <label class="forLabel">Odbijen</label>
+
+
+
+
+
+    <div id="Kontakt" ondrop="drop1(event)" ondragover="allowDrop(event)" class="column"></div>
+    <div id="Intervju" ondrop="drop2(event)" ondragover="allowDrop(event)" class="column"></div>
+    <div id="Test" ondrop="drop3(event)" ondragover="allowDrop(event)" class="column"></div>
+    <div id="Odbrana" ondrop="drop4(event)" ondragover="allowDrop(event)" class="column"></div>
+    <div id="Ponuda" ondrop="drop5(event)" ondragover="allowDrop(event)" class="column"></div>
+    <div id="Primljen" ondrop="drop6(event)" ondragover="allowDrop(event)" class="column"></div>
+    <div id="Odustao" ondrop="drop7(event)" ondragover="allowDrop(event)" class="column"></div>
+    <div id="Odbijen" ondrop="drop8(event)" ondragover="allowDrop(event)" class="column"></div>
+</div>
+
+<script>
+         $.ajax({
+        type: 'POST',
+        dataType: 'json',
+        data: {  },
+        cache: false,
+        url: '@Url.Action("GetInterviewerInstancesData", "Process")',
+        success: function (obj) {
+
+        $.each(obj.data.Contacts, function (i, f) {
+
+        $('#Kontakt').append("<div class='kontact' id=" + f.Id + " ><a href=@Url.Action("EditContactInProcess","Process")/?id=" + f.Id + " ><p>" + f.ContactName + "</p><hr><p>" + f.ProcessName + "</p><p>" + f.ContactTechnologies +"</p></a></div>")
+        });
+        $.each(obj.data.Interviews, function (i, f) {
+
+        $('#Intervju').append("<div class='kontact' id=" + f.Id + " ><a href=@Url.Action("EditContactInProcess","Process")/?id=" + f.Id + " ><p>" + f.ContactName + "</p><hr><p>" + f.ProcessName + "</p><p>" + f.ContactTechnologies +"</p></a></div>")
+        });
+        $.each(obj.data.Tests, function (i, f) {
+
+        $('#Test').append("<div class='kontact' id=" + f.Id + " ><a href=@Url.Action("EditContactInProcess","Process")/?id=" + f.Id + " ><p>" + f.ContactName + "</p><hr><p>" + f.ProcessName + "</p><p>" + f.ContactTechnologies +"</p></a></div>")
+        });
+
+        $.each(obj.data.TestDefenses, function (i, f) {
+
+        $('#Odbrana').append("<div class='kontact' id=" + f.Id + " ><a href=@Url.Action("EditContactInProcess","Process")/?id=" + f.Id + " ><p>" + f.ContactName + "</p><hr><p>" + f.ProcessName + "</p><p>" + f.ContactTechnologies +"</p></a></div>")
+        });
+        $.each(obj.data.Offers, function (i, f) {
+
+        $('#Ponuda').append("<div class='kontact' id=" + f.Id + " ><a href=@Url.Action("EditContactInProcess","Process")/?id=" + f.Id + " ><p>" + f.ContactName + "</p><hr><p>" + f.ProcessName + "</p><p>" + f.ContactTechnologies +"</p></a></div>")
+        });
+        $.each(obj.data.Accepts, function (i, f) {
+
+        $('#Primljen').append("<div class='kontact' id=" + f.Id + " ><a href=@Url.Action("EditContactInProcess","Process")/?id=" + f.Id + " ><p>" + f.ContactName + "</p><hr><p>" + f.ProcessName + "</p><p>" + f.ContactTechnologies +"</p></a></div>")
+        });
+        $.each(obj.data.Rejects, function (i, f) {
+
+        $('#Odbijen').append("<div class='kontact' id=" + f.Id + " ><a href=@Url.Action("EditContactInProcess","Process")/?id=" + f.Id + " ><p>" + f.ContactName + "</p><hr><p>" + f.ProcessName + "</p><p>" + f.ContactTechnologies +"</p></a></div>")
+        });
+        $.each(obj.data.Quits, function (i, f) {
+
+        $('#Odustao').append("<div class='kontact' id=" + f.Id + " ><a href=@Url.Action("EditContactInProcess","Process")/?id=" + f.Id + " ><p>" + f.ContactName + "</p><hr><p>" + f.ProcessName + "</p><p>" + f.ContactTechnologies +"</p></a></div>")
+        });
+        }
+    });
+    </script>

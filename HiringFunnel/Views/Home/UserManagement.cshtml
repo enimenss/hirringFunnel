@@ -1,0 +1,424 @@
+﻿@model HiringFunnel.DTO.RegisterUser
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+@using HiringFunnel.DTO;
+
+
+@{
+    ViewBag.Title = "UserManagement";
+}
+
+@{
+    List<TechnologyView> techno = (List<TechnologyView>)TempData["Techno"];
+}
+
+<style>
+    body{
+        width:100%;
+        
+    }
+</style>
+<div class="container">
+    <div class="row">
+
+        <div class="col-md-2" style="height:100%"></div>
+        <div class="col-md-8" style="margin-top:3%;text-align:center;height:50%">
+            <div style="height:50%">
+            
+            <table class="table" id="myTable" style="margin-top:3%">
+                <thead border="1" style="background-color:#555">
+                    <tr>
+                        <td>
+                            <input type="text" placeholder="FirstName" id="tFirstName" style="width:100%" />
+                        </td>
+                        <td>
+                            <input type="text" placeholder="LastName" id="tLastName" style="width:100%" />
+                        </td>
+                       
+                        <td>
+                            @*<input type="text" placeholder="Seniority" id="tSeniority" style="width:100%" />*@
+                            <select id="tSeniority">
+                                <option value='' selected>Seniority</option>
+                                <option value="Entry">Entry</option>
+                                <option value="Junior">Junior</option>
+                                <option value="Medior">Medior</option>
+                                <option value="Senior">Senior</option>
+                            </select>
+                        </td>
+                        <td></td>
+                        <td>
+                            @*<input type="text" placeholder="Tehnologies" id="tTechnologies" style="width:100%" />*@
+                            <select id="tTechnologies">
+                                <option value="" selected>Technology</option>
+                                @foreach (var tech in techno)
+                                {
+                                    <option value='@tech.Name'>@tech.Name</option>
+                                }
+                            </select>
+                        </td>
+                        <td></td>
+                        <td><input type="button" value="Search" id="btnSearch" style="width:100%" /></td>
+                    </tr>
+                    <tr>
+                        <th>
+                            FirstName
+                        </th>
+                        <th>
+                            LastName
+                        </th>
+
+                        <th>
+                            Seniority
+                        </th>
+
+                        <th>
+                            Role
+                        </th>
+                        <th>
+                            Technologies
+                        </th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+            </table>
+                
+                @using (Html.BeginForm())
+                {
+                    <div id="show" style="display:none">
+                        @*<form action="/Register/Index" method="post">*@
+                        @Html.AntiForgeryToken()
+
+                        <div class="form-inline">
+                            <h4 id="Mode">Dodaj Novog Korisnika</h4>
+                            <hr />
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div style="float:left;margin-right:3%">
+                                        <div class="form-group">
+
+                                            <label class="control-label col-md-4">FirstName</label>
+                                            <div class="col-md-8">
+
+                                                <input type="text" id="FirstName" name="FirstName" class="form-control" />
+                                                @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "text-danger" })
+
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+
+                                            <label class="control-label col-md-4">LastName</label>
+                                            <div class="col-md-8">
+
+                                                <input type="text" id="LastName" name="LastName" class="form-control" />
+                                                @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text-danger" })
+
+                                            </div>
+                                        </div>
+
+
+                                        <div class="form-group">
+                                            <label class="control-label col-md-4" style="float:left">Seniority</label>
+                                            <div class="col-md-8">
+                                                <select name="Seniority" id="Seniority">
+                                                    <option value="0">Entry</option>
+                                                    <option value="1">Junior</option>
+                                                    <option value="2">Medior</option>
+                                                    <option value="5">Senior</option>
+                                                </select>
+                                                @Html.ValidationMessageFor(model => model.Seniority, "", new { @class = "text-danger" })
+                                            </div>
+                                           
+
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label col-md-4">Role</label>
+                                            <div class="col-md-8">
+                                                <select name="Role" id="Role">
+                                                    <option value="0">Interviewer</option>
+                                                    <option value="1">HR</option>
+                                                    <option value="2">Admin</option>
+                                                </select>
+                                                @Html.ValidationMessageFor(model => model.Role, "", new { @class = "text-danger" })
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+
+                                        <label class="control-label col-md-4">Email</label>
+                                        <div class="col-md-8">
+
+                                            <input type="text" id="Email" name="Email" class="form-control" />
+                                            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+
+                                        <label class="control-label col-md-4">Password</label>
+                                        <div class="col-md-8">
+
+                                            <input type="text" id="Password" name="Password" class="form-control" />
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+
+                                        <div class="col-md-10">
+                                            <select id="Technologies" name="techno" multiple="multiple" size="4">
+                                                @foreach (TechnologyView tech in techno)
+                                                {
+                                                    <option value='@tech.Id'>@tech.Name</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="col-md-offset-4 col-md-8">
+                                            <input id="c_u" type="submit" value="Create" class="btn btn-default" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                    
+        </div>
+            </div>
+        <div class="col-md-2"><button onclick="Show()" style="margin-top:10%;text-align:center">DodajKorisnika</button></div>
+        </div>
+    </div>
+
+
+<div class="modal modal-scroll fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h4 class="modal-title item-name" style="text-align: center; margin-bottom: 0%; font-weight: 900">Delete Comment</h4>
+                </div>
+            </div>
+            <div class="modal-body">
+
+                <div id="deleteDetails" style="text-align:center">
+                   <span>Dali ste sigurni da zelite da obrisete korisnika:</span>&nbsp;<span id="korisnik"></span>
+                </div>
+            </div>
+            <div id="modalDelete" class="modal-footer">
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+    <script src="~/Scripts/DataTables/jquery.dataTables.js"></script>
+<link rel="stylesheet" type="text/css" href="~/Content/DataTables/css/jquery.dataTables.css">
+
+<script>
+    $(document).ready(function () {
+
+        var error =@Html.Raw(Json.Encode(ViewBag.Error));
+            $('#myTable').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "orderMulti": false,
+                "dom": '<"top"i>rt<"bottom"lp><"clear">',
+                "aLengthMenu": [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]],
+                "ajax": {
+                    "url": "LoadUserData",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "columns": [
+
+                    { "data": "FirstName", "name": "FirstName", "autoWidth": true },
+                    { "data": "LastName", "name": "LastName", "autoWidth": true },
+                    { "data": "Seniority", "name": "Seniority", "autoWidth": true },
+                    { "data": "Role", "name": "Role", "autoWidth": true },
+                    { "data": "Technologies", "name": "Technologies", "autoWidth": true },
+
+                    {
+
+                        'render': function (data, type, row) {
+
+
+                            return "<button type='submit' onclick='Edit(this)' name='UserId' value=" + row.Id + " id=" + row.Id + " >Edit</button></form>";
+                        }
+                    },
+
+                    {
+
+                        'render': function (data, type, row) {
+
+
+                            return "<button type='button' onclick='DeleteUser(this)' value=" + row.Id + " data-toggle='modal' data-target='#deleteModal' >Delete</button>";
+                        }
+                    }
+                ]
+
+
+            });
+
+        eTable = $('#myTable').DataTable();
+    $('#btnSearch').click(function () {
+            eTable.columns(0).search($('#tFirstName').val().trim());
+        eTable.columns(1).search($('#tLastName').val().trim());
+        eTable.columns(4).search($('#tSeniority option:selected').val().trim());
+        eTable.columns(5).search($('#tTechnologies option:selected').val().trim());
+        eTable.draw();
+    });
+
+    //vrati = function (event) {
+            //    var roww = $("#"+event.id).parents('tr')[0]
+            //    var data = eTable.row(roww).data();
+            //    console.log(data);
+            //    eTable.row(roww).node().remove();
+            //    eTable.draw();
+            //}
+
+            if (error != undefined || error != null) {
+        x = document.getElementById('show');
+        x.style.display = 'block';
+    }
+    });
+
+
+
+
+        function Show() {
+            var x = document.getElementById('show');
+
+            $('#Mode').text("Dodaj Novog Korisnika");
+
+
+            x.style.display = 'block';
+            var e = $('#identity')
+            e.remove();
+            $('#FirstName').val("");
+            $('#LastName').val("");
+            $('#FirstName').val("");
+            $('#Email').val("");
+            $('#Password').val("");
+            $('#c_u').val("Create");
+
+
+        }
+
+        Edit = function (element) {
+
+            var roww = $(element).parents('tr')[0]
+            var data = eTable.row(roww).data();
+
+            //var item = $.grep(ITEM_DATA, function (e) { return e.Id == event.value; });
+            var x = document.getElementById('show');
+
+
+            x.style.display = 'block';
+
+
+            var z = $('#show');
+            var id = $("#" + data.Id);
+            var e = $('#identity')
+            e.remove();
+            z.append("<input type='hidden' id='identity' name='Id' value=" + data.Id + " />")
+            $('#FirstName').val(data.FirstName);
+            $('#LastName').val(data.LastName);
+
+            $("#Seniority option").each(function () {
+                    $(this).attr("selected",false);
+            });
+
+            $("#Role option").each(function () {
+                    $(this).attr("selected",false);
+
+            });
+
+
+
+            $("#Seniority option").each(function () {
+                if ($(this).text() == data.Seniority) {
+                    $(this).attr("selected",true);
+
+                }
+            });
+
+            $("#Role option").each(function () {
+                if ($(this).text() == data.Role) {
+                    $(this).attr("selected",true);
+
+                }
+            });
+
+            //$("#Technologies option").each(function () {
+            //    var tech = data.Technologies;
+            //    for (var i = 0; i < tech.length; i++) {
+            //        if (tech[i] == $(this).text()) {
+            //            $(this).attr("selected","selected");
+            //        }
+            //    }
+            //});
+
+             $("#Technologies option").attr("selected", false);
+             $.each(data.Technologies, function (i, f) {
+                 console.log(f);
+                 $('#Technologies option[text=' + f + ']').attr('selected', true);
+             });
+            //})
+            $('#Email').val(data.Email);
+            $('#Password').val("");
+            $('#Mode').text("Azuriraj");
+            //$("#Technologies option").attr("selected", false);
+            //$.each(item[0].Technologies, function (i, f) {
+            //    $('#Technologies option[value=' + f.Id + ']').attr('selected', true);
+                //$('#Technologies option').val(f.Id);
+            //})
+            $('#c_u').val("Update");
+
+        }
+
+        var DeleteUser = function (element) {
+            var ele = $(element);
+            var roww =ele.parents('tr')[0]
+            var data = $('#myTable').DataTable().row(roww).data();
+            var Korisnik = $("#korisnik");
+            var Delete = $("#modalDelete");
+            Korisnik.empty();
+            Delete.empty();
+            Korisnik.text(data.FirstName);
+            Delete.append("<button  type='button' onclick='DeleteUserAjax(this.value)' value="+data.Id+">Delete</button>")
+        }
+
+        var DeleteUserAjax = function (Id) {
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                data: { "Id": Id },
+                cache: false,
+                url: '@Url.Action("DeleteUser","Home")',
+                success: function (obj) {
+                    $('#myTable').DataTable().ajax.reload().draw();
+                    $('#deleteModal').modal('hide');
+                }
+
+            });
+        }
+
+</script>
+
+
+    
+
+

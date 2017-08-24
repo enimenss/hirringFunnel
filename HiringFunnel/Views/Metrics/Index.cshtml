@@ -1,0 +1,363 @@
+﻿@using HiringFunnel.DTO;
+@{
+    ViewBag.Title = "Metrics";
+}
+
+@{
+    List<TechnologyView> techno = (List<TechnologyView>)TempData["Techno"];
+    SessionLogin User = (SessionLogin)Session["User"];
+}
+
+<div class="container">
+<div class="row">
+    <div class="col-md-6">
+        <div style="border: 1px solid black;padding:1%;width:90%;margin-top:3%">
+            <h3>Metrika</h3>
+            <div style="text-align:center">
+          <select id="MSeniority" style="margin:1%">
+              <option value='@SeniorityLevel.Entry'>Entry</option>
+              <option value='@SeniorityLevel.Junior'>Junior</option>
+              <option value='@SeniorityLevel.Medior'>Entry</option>
+              <option value='@SeniorityLevel.Senior'>Senior</option>
+          </select>
+            <select id="MTechnology" style="margin:1%">
+              @foreach(var tech in techno)
+              {
+                  <option value='@tech.Name' >@tech.Name</option>
+              }
+            </select>
+                </div>
+            <div style="text-align:center"><button onclick="Prosek()" >Izracunaj</button></div>
+           
+                <p>Prosecno trajanje procesa:&nbsp;<span id="ProsecnoTrajanje"></span></p>
+            <div style="width:95%;margin:2%;">
+                <span>Najduzi proces</span>
+                <button onclick="NajduziOdSelektovanihProcesa()"  style="float:right">Pogledaj</button>
+            </div>
+            <div style="width:95%;margin:2%">
+                <span>Najkraci proces</span>
+                <button onclick="NajkraciOdSelektovanihProcesa()"  style="float:right">Pogledaj</button>
+            </div>
+            <div><h3>Trajanje statusa</h3></div>
+            <div style="width:95%;margin:2%;">
+                <span>Najduzi status za tehnologiju i senioritet</span>
+                <button style="float:right">Pogledaj</button>
+            </div>
+            <div style="width:95%;margin:2%">
+                <span>Najkraci status za tehnologiju i senioritet</span>
+                <button style="float:right">Pogledaj</button>
+            </div>
+
+    </div>
+        <div style="border: 1px solid black;padding:1%;width:80%;margin-top:2%">
+            <h3>Kriticne vrednosti</h3>
+            <p>Prosecna vrednost trajanja svih procesa</p>
+            <div style="width:85%;margin:2%;">
+                <span>Najduzi od svih  procesa</span>
+                <button onclick="NajduziOdSvihProcesa()" style="float:right">Pogledaj</button>
+            </div>
+            <div style="width:85%;margin:2%;">
+                <span>Najkraci od svih  procesa</span>
+                <button  onclick="NajkraciOdSvihProcesa()" style="float:right">Pogledaj</button>
+            </div>
+            <p>Prosecna vrednost trajanja svih statusa</p>
+            <div style="width:85%;margin:2%;">
+                <span>Najduzi od svih  statusa</span>
+                <button style="float:right">Pogledaj</button>
+            </div>
+            <div style="width:85%;margin:2%;">
+                <span>Najkraci od svih  statusa</span>
+                <button style="float:right">Pogledaj</button>
+            </div>
+            <div style="width:85%;margin:2%;">
+                <span><select><option>Izaberi status</option></select></span>
+                <button style="float:right">Izracunaj</button>
+            </div>
+            <p>Prosecna vrednost trajanja odabranog statusa</p>
+        </div>
+        </div>
+    <div class="col-md-6">
+        <div style="border: 1px solid black;padding:1%;width:90%;margin-top:4%">
+            <div style="text-align:center">
+               
+                <select id="ZSeniority" style="margin:1%">
+                    <option value='@SeniorityLevel.Entry'>Entry</option>
+                    <option value='@SeniorityLevel.Junior'>Junior</option>
+                    <option value='@SeniorityLevel.Medior'>Entry</option>
+                    <option value='@SeniorityLevel.Senior'>Senior</option>
+                </select>
+                <select id="ZTechnology" style="margin:1%">
+                    @foreach (var tech in techno)
+                    {
+                        <option value='@tech.Name'>@tech.Name</option>
+                    }
+                </select>
+                <input id="ZDatum" type="month" />
+            </div>
+            <div style="text-align:center"><button onclick="brZapIProc()">Izracunaj</button></div>
+            <div>
+            <table class="table" id="myTable" style="margin-top:4%">
+             <thead border="1" style="background-color:#555">
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Technologies
+            </th>
+            <th>
+                Seniority
+            </th>
+            <th>
+                Duration
+            </th>
+
+
+            <th>Edit</th>
+
+        </tr>
+    </thead>
+</table></div>
+            <div>
+                <p>Broj Zaposlenih u ovom periodu:&nbsp;<span id="brZap"></span></p>
+                <p>Broj procesa u ovom periodu:&nbsp;<span id="brProc"></span></p>
+            </div>
+        </div>
+        </div>
+    </div>
+    </div>
+
+<div class="modal modal-scroll fade" id="MetricsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h4 id="header" class="modal-title item-name" style="text-align: center; margin-bottom: 0%; font-weight: 900"></h4>
+                </div>
+            </div>
+            <div class="modal-body">
+
+                <div id="deleteDetails" style="text-align:center">
+                    <span>Ime:</span>&nbsp;<span id="ProcessName"></span><br>
+                    <span>Datum Pocetka:</span>&nbsp;<span id="ProcessStartDate"></span><br>
+                    <span>Datum Kraja:</span>&nbsp;<span id="ProcessEndDate"></span><br>
+
+
+                </div>
+            </div>
+            <div id="modalDelete" class="modal-footer">
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<script src="~/Scripts/DataTables/jquery.dataTables.js"></script>
+<link rel="stylesheet" type="text/css" href="~/Content/DataTables/css/jquery.dataTables.css">
+<script>
+
+    var User =@Html.Raw(Json.Encode(User));
+
+    $(document).ready(function () {
+
+
+        $('#myTable').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "orderMulti": false,
+            "dom": '<"top"i>rt<"bottom"lp><"clear">',
+            "aLengthMenu": [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]],
+            "ajax": {
+                "url": '@Url.Action("LoadProcessData", "Metrics")',
+                "type": "POST",
+                "datatype": "json",
+                "data": function (d) {
+                    d.Seniority = $("#ZSeniority option:selected").val();
+                    d.Technology = $("#ZTechnology option:selected").val();
+                    d.Date = $("#ZDatum").val();
+                }
+            },
+            "destroy": true,
+            "columns": [
+
+                { "data": "Name", "name": "Name", "autoWidth": true },
+                { "data": "Technologies", "name": "Technologies", "autoWidth": true },
+                { "data": "Seniority", "name": "Seniority", "autoWidth": true },
+                { "data": "Duration", "name": "Duration", "autoWidth": true },
+
+                {
+
+
+                    'render': function (data, type, row) {
+
+
+                        return User.Role!=0?"<a href=@Url.Action("EditProcess","Process")/?id=" + row.Id + " value=" + row.Id + " id=" + row.Id + " >Edit</a>":"";
+                    }
+                }
+            ]
+
+
+        });
+    }
+         );
+
+
+
+    var NajduziOdSvihProcesa = function () {
+        $.ajax({
+            type: 'post',
+            dataType: 'json',
+            url: '@Url.Action("VratiNajduziProces","Metrics")',
+            cache: false,
+            success: function (data) {
+                var Header = $('#header');
+                var Ime = $('#ProcessName');
+                var Pocetak = $('#ProcessStartDate');
+                var Kraj = $('#ProcessEndDate');
+                Ime.empty();
+                Pocetak.empty();
+                Kraj.empty();
+                Header.empty();
+                Header.text("Najduzi Proces");
+                Ime.text(data.Name);
+                Pocetak.text(data.StartDate);
+                Kraj.text(data.EndDate);
+                $('#MetricsModal').modal("show");
+
+            }
+
+
+        });
+    }
+
+    var NajduziOdSelektovanihProcesa = function () {
+        var Seniority = $("#MSeniority option:selected").val();
+        var Technology = $("#MTechnology option:selected").val();
+        $.ajax({
+            type: 'post',
+            dataType: 'json',
+            data: { 'Seniority': Seniority, 'Technology': Technology },
+            url: '@Url.Action("VratiNajduziOdSelektovanihProcesa","Metrics")',
+            cache: false,
+            success: function (data) {
+                var Header = $('#header');
+                var Ime = $('#ProcessName');
+                var Pocetak = $('#ProcessStartDate');
+                var Kraj = $('#ProcessEndDate');
+                Ime.empty();
+                Pocetak.empty();
+                Kraj.empty();
+                Header.empty();
+                Header.text("Najduzi Proces");
+                Ime.text(data.Name);
+                Pocetak.text(data.StartDate);
+                Kraj.text(data.EndDate);
+                $('#MetricsModal').modal("show");
+
+            }
+
+
+        });
+    }
+
+
+    var NajkraciOdSvihProcesa = function () {
+
+          $.ajax({
+            type: 'post',
+            dataType: 'json',
+            url: '@Url.Action("VratiNajkraciProces","Metrics")',
+            cache: false,
+            success: function (data) {
+                var Header = $('#header');
+                var Ime = $('#ProcessName');
+                var Pocetak = $('#ProcessStartDate');
+                var Kraj = $('#ProcessEndDate');
+                Ime.empty();
+                Pocetak.empty();
+                Kraj.empty();
+                Header.empty();
+                Header.text("Najkraci Proces");
+                Ime.text(data.Name);
+                Pocetak.text(data.StartDate);
+                Kraj.text(data.EndDate);
+                $('#MetricsModal').modal("show");
+
+            }
+
+
+        });
+    }
+
+       var NajkraciOdSelektovanihProcesa = function () {
+           var Seniority = $("#MSeniority option:selected").val();
+           var Technology = $("#MTechnology option:selected").val();
+          $.ajax({
+            type: 'post',
+            dataType: 'json',
+            data: { 'Seniority': Seniority, 'Technology': Technology },
+            url: '@Url.Action("VratiNajkraciOdSelektovanihProcesa","Metrics")',
+            cache: false,
+            success: function (data) {
+                var Header = $('#header');
+                var Ime = $('#ProcessName');
+                var Pocetak = $('#ProcessStartDate');
+                var Kraj = $('#ProcessEndDate');
+                Ime.empty();
+                Pocetak.empty();
+                Kraj.empty();
+                Header.empty();
+                Header.text("Najkraci Proces");
+                Ime.text(data.Name);
+                Pocetak.text(data.StartDate);
+                Kraj.text(data.EndDate);
+                $('#MetricsModal').modal("show");
+
+            }
+
+
+        });
+    }
+
+    var Prosek = function () {
+        console.log("uso");
+        var Seniority = $("#MSeniority option:selected").val();
+        var Technology = $("#MTechnology option:selected").val();
+        $.ajax({
+            type: 'post',
+            dataType: 'json',
+            data: { 'Seniority': Seniority, 'Technology': Technology },
+            url: '@Url.Action("ProsecnoTrajanjeProcesa", "Metrics")',
+            cache: false,
+            success: function (data) {
+                var prosek = $("#ProsecnoTrajanje");
+                prosek.empty();
+                prosek.text(data.data);
+            }
+        }
+        );
+       }
+
+    var brZapIProc = function () {
+        $('#myTable').DataTable().ajax.reload().draw();
+        var Seniority = $("#ZSeniority option:selected").val();
+        var Technology = $("#ZTechnology option:selected").val();
+        var Date = $("#ZDatum").val();
+         $.ajax({
+            type: 'post',
+            dataType: 'json',
+            data: { 'Seniority': Seniority, 'Technology': Technology, "Date":Date },
+            url: '@Url.Action("brZapIProc", "Metrics")',
+            cache: false,
+            success: function (data) {
+                var zap = $("#brZap");
+                var proc = $("#brProc");
+                zap.empty();
+                proc.empty();
+                zap.text(data.Zap);
+                proc.text(data.Proc);
+            }
+        }
+        );
+    }
+</script>
